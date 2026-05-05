@@ -1,0 +1,2756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Cheatsheet — 2.54.0</title>
+<link rel="icon" href="https://fav.farm/🔥" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e10;
+    --bg-raised: #161618;
+    --bg-sunk: #0a0a0c;
+    --border: #2a2a2e;
+    --border-strong: #3a3a42;
+    --text: #ededea;
+    --text-dim: #a8a6a0;
+    --text-faint: #6a6862;
+
+    /* Git palette */
+    --git-red: #f05032;
+    --git-red-bright: #ff6a4d;
+    --git-red-soft: #2e1410;
+    --git-grey: #5c5c5e;
+
+    --accent: var(--git-red);
+    --accent-soft: var(--git-red-soft);
+    --accent-bright: var(--git-red-bright);
+
+    --key: #f0c07a;
+    --cmd: #8fb8a8;
+    --string: #c9a876;
+    --warn: #f0a060;
+    --danger: #c85a4e;
+    --good: #6a9a7b;
+    --purple: #a896c9;
+    --link: #b7d4c4;
+    --new: #6fcfa0;
+    --new-soft: #0e2a1e;
+
+    --body: 15px;
+    --small: 13.5px;
+    --tiny: 12px;
+    --code: 13.5px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--body);
+    line-height: 1.65;
+    padding: 0;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(240,80,50,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(92,92,94,0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+    padding-top: 148px;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 40px 32px 120px; }
+
+  /* ===== Fixed Header ===== */
+  header.banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(14, 14, 16, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .banner-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 26px 32px 22px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+  .title-link { display: inline-block; text-decoration: none; color: inherit; cursor: pointer; transition: opacity 0.15s; }
+  .title-link:hover { opacity: 0.85; }
+  .title-block h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 56px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+  .title-block h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--tiny);
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  .tagline span { color: var(--text); }
+  .meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--tiny);
+    color: var(--text-dim);
+    line-height: 1.9;
+  }
+  .meta .ver {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 10px;
+    border: 1px solid var(--accent);
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 11px;
+  }
+  .meta code { color: var(--key); }
+
+  /* ===== TOC ===== */
+  nav.toc {
+    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    padding: 22px 26px;
+    margin-bottom: 56px;
+  }
+  nav.toc h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  nav.toc ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 6px 24px;
+  }
+  nav.toc a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: var(--small);
+    display: flex;
+    gap: 10px;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+  nav.toc a:hover { color: var(--accent); }
+  nav.toc a .num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-faint);
+    font-size: 11px;
+    min-width: 22px;
+  }
+
+  /* ===== Sections ===== */
+  section { margin-bottom: 80px; scroll-margin-top: 160px; }
+  .section-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: baseline;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 30px;
+  }
+  .section-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--text-faint);
+    font-style: italic;
+  }
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .section-head .sub {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--tiny);
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+    font-style: normal;
+  }
+
+  h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin: 36px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border);
+  }
+  h3:first-child { margin-top: 0; }
+
+  h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 22px 0 10px;
+    letter-spacing: 0.005em;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); max-width: 80ch; }
+  p.lede { color: var(--text-dim); font-size: var(--body); line-height: 1.7; }
+
+  a.ref {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(183,212,196,0.4);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  a.ref:hover { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
+  a.ref::after { content: ' ↗'; font-size: 0.85em; color: var(--text-faint); }
+
+  .docs-links {
+    margin-top: 28px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    font-size: var(--small);
+  }
+  .docs-links-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+  .docs-links ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+  }
+  .docs-links li { margin: 0; padding: 0; }
+  .docs-links li::before { display: none; }
+
+  code { font-family: 'JetBrains Mono', monospace; font-size: var(--code); }
+  p code, li code, td code {
+    background: var(--bg-sunk);
+    color: var(--key);
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-size: 12.5px;
+  }
+  pre {
+    background: var(--bg-sunk);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent);
+    padding: 16px 20px;
+    margin: 12px 0 22px;
+    overflow-x: auto;
+    font-size: var(--code);
+    line-height: 1.7;
+    position: relative;
+  }
+  pre code { background: none; border: none; padding: 0; color: var(--text); font-size: var(--code); }
+  pre .c { color: var(--text-faint); font-style: italic; }
+  pre .k { color: var(--accent); }
+  pre .v { color: var(--key); }
+  pre .s { color: var(--cmd); }
+  pre .f { color: var(--purple); }
+  pre .n { color: var(--new); }
+  pre .r { color: var(--danger); }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 24px; font-size: var(--small); }
+  th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: var(--text-faint);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  td {
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--key);
+    font-weight: 500;
+    white-space: nowrap;
+    padding-right: 24px;
+    font-size: 12.5px;
+  }
+  tr:last-child td { border-bottom: none; }
+  table.wide td:first-child { white-space: normal; }
+
+  ul, ol { padding-left: 22px; margin-bottom: 16px; }
+  li { margin-bottom: 7px; color: var(--text); }
+  li::marker { color: var(--text-faint); }
+  ul.plain { list-style: none; padding-left: 0; }
+  ul.plain li { padding-left: 18px; position: relative; }
+  ul.plain li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .banner-inner { grid-template-columns: 1fr; }
+    .meta { text-align: left; }
+    body { padding-top: 180px; }
+    section { scroll-margin-top: 200px; }
+    .title-block h1 { font-size: 42px; }
+  }
+
+  .note {
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--key);
+    padding: 14px 18px;
+    margin: 16px 0;
+    background: rgba(240, 192, 122, 0.03);
+    font-size: var(--small);
+    line-height: 1.65;
+  }
+  .note.warn { border-left-color: var(--warn); background: rgba(240, 160, 96, 0.04); }
+  .note.danger { border-left-color: var(--danger); background: rgba(200, 90, 78, 0.04); }
+  .note.good { border-left-color: var(--good); background: rgba(106, 154, 123, 0.04); }
+  .note.new { border-left-color: var(--new); background: rgba(111, 207, 160, 0.04); }
+  .note.git { border-left-color: var(--accent); background: rgba(240, 80, 50, 0.04); }
+  .note .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-right: 10px;
+    color: var(--key);
+  }
+  .note.warn .label { color: var(--warn); }
+  .note.danger .label { color: var(--danger); }
+  .note.good .label { color: var(--good); }
+  .note.new .label { color: var(--new); }
+  .note.git .label { color: var(--accent); }
+  .note .label::after { content: '·'; margin-left: 10px; color: var(--text-faint); }
+
+  kbd {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    color: var(--key);
+    background: var(--bg-sunk);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    margin: 0 1px;
+    line-height: 1.4;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    color: var(--text-dim);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tag.modern { color: var(--new); border-color: var(--new); }
+  .tag.legacy { color: var(--text-faint); border-color: var(--border-strong); }
+  .tag.deprecated { color: var(--danger); border-color: var(--danger); text-decoration: line-through; }
+  .tag.danger { color: var(--danger); border-color: var(--danger); }
+  .tag.tip { color: var(--key); border-color: var(--key); }
+  .tag.git { color: var(--accent); border-color: var(--accent); }
+  .tag.gh { color: var(--purple); border-color: var(--purple); }
+  .tag.v { color: var(--text-faint); border-color: var(--border); font-size: 9.5px; }
+
+  /* Diagram block — three-tree visualization */
+  .three-tree {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 18px 0 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .tree-col {
+    border: 1px solid var(--border);
+    background: var(--bg-sunk);
+    padding: 14px 16px;
+  }
+  .tree-col .label {
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .tree-col .name { color: var(--key); font-size: 13px; margin-bottom: 6px; }
+  .tree-col .desc { color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 12.5px; line-height: 1.55; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+    margin-top: 64px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--tiny);
+    color: var(--text-faint);
+  }
+  footer a { color: var(--text-dim); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg-sunk); }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+  #top { scroll-margin-top: 0; }
+</style>
+</head>
+<body>
+
+<span id="top" aria-hidden="true"></span>
+
+<!-- ===== Fixed Banner ===== -->
+<header class="banner">
+  <div class="banner-inner">
+    <a href="#" class="title-link" aria-label="Back to top">
+      <div class="title-block">
+        <h1>Git <em>&amp;</em> GitHub</h1>
+        <div class="tagline">Distributed version control · <span>v2.54.0 master cheatsheet</span> · modern syntax · CLI-first collaboration</div>
+      </div>
+    </a>
+    <div class="meta">
+      <div class="ver">git 2.54.0</div><br>
+      Verify install: <code>git --version</code><br>
+      GitHub CLI: <code>gh --version</code>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===== TOC ===== -->
+<nav class="toc">
+  <h2>Contents</h2>
+  <ul>
+    <li><a href="#mental-model"><span class="num">01</span>Mental model</a></li>
+    <li><a href="#install"><span class="num">02</span>Install &amp; identity</a></li>
+    <li><a href="#essentials"><span class="num">03</span>Repo essentials</a></li>
+    <li><a href="#staging"><span class="num">04</span>Staging &amp; committing</a></li>
+    <li><a href="#history"><span class="num">05</span>History &amp; inspection</a></li>
+    <li><a href="#diff"><span class="num">06</span>Diff &amp; comparison</a></li>
+    <li><a href="#undo"><span class="num">07</span>Undoing changes</a></li>
+    <li><a href="#branching"><span class="num">08</span>Branching</a></li>
+    <li><a href="#merging"><span class="num">09</span>Merging</a></li>
+    <li><a href="#stashing"><span class="num">10</span>Stashing</a></li>
+    <li><a href="#remotes"><span class="num">11</span>Remotes</a></li>
+    <li><a href="#fetch-pull"><span class="num">12</span>Fetch &amp; pull</a></li>
+    <li><a href="#rebase"><span class="num">13</span>Rebase</a></li>
+    <li><a href="#tags"><span class="num">14</span>Tags &amp; releases</a></li>
+    <li><a href="#reflog"><span class="num">15</span>Reflog &amp; rescue</a></li>
+    <li><a href="#worktrees"><span class="num">16</span>Worktrees &amp; sparse</a></li>
+    <li><a href="#plumbing"><span class="num">17</span>Plumbing &amp; objects</a></li>
+    <li><a href="#config"><span class="num">18</span>Config &amp; aliases</a></li>
+    <li><a href="#github"><span class="num">19</span>GitHub via CLI</a></li>
+    <li><a href="#workflows"><span class="num">20</span>Workflows that pay rent</a></li>
+    <li><a href="#protips"><span class="num">21</span>Pro-tips &amp; gotchas</a></li>
+  </ul>
+</nav>
+
+<!-- ============ 01 MENTAL MODEL ============ -->
+<section id="mental-model">
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <h2>Mental model<span class="sub">how the pieces fit together</span></h2>
+  </div>
+
+  <p class="lede">Git is a content-addressable filesystem with a VCS UI bolted on top. Every command becomes intuitive once you internalize three trees, four object types, and one immutable history graph.</p>
+
+  <h3>The three trees</h3>
+  <p>Almost every Git command moves data between these three locations. Understanding which is which removes 90% of beginner confusion.</p>
+
+  <div class="three-tree">
+    <div class="tree-col">
+      <div class="label">Tree 1 / Local</div>
+      <div class="name">Working Directory</div>
+      <div class="desc">Files on disk you edit in your editor. Untracked, modified, or matching the index.</div>
+    </div>
+    <div class="tree-col">
+      <div class="label">Tree 2 / Local</div>
+      <div class="name">Staging Area · Index</div>
+      <div class="desc">A proposed next snapshot. Lives in <code>.git/index</code>. <code>git add</code> writes to it; <code>git commit</code> seals it.</div>
+    </div>
+    <div class="tree-col">
+      <div class="label">Tree 3 / Local</div>
+      <div class="name">Repository · HEAD</div>
+      <div class="desc">The committed object database under <code>.git/objects</code>. Immutable. <code>HEAD</code> points at the current branch tip.</div>
+    </div>
+  </div>
+
+  <h3>The four object types</h3>
+  <table>
+    <tr><td>blob</td><td>File contents. No name, no metadata. Addressed by SHA-1/SHA-256 of contents + header.</td></tr>
+    <tr><td>tree</td><td>Directory listing — points to blobs and other trees with names and modes.</td></tr>
+    <tr><td>commit</td><td>Snapshot pointer to one tree, plus author, committer, message, and parent commit(s).</td></tr>
+    <tr><td>tag</td><td>Annotated tag: a named pointer to any object with its own message and signature.</td></tr>
+  </table>
+
+  <p>Branches and lightweight tags are not objects — they are <strong>refs</strong>: tiny text files in <code>.git/refs/</code> containing a single SHA. Cheap to create, cheap to delete.</p>
+
+  <h3>The agentic Git loop</h3>
+  <ol>
+    <li><strong>Modify</strong> files in the working directory.</li>
+    <li><strong>Stage</strong> a logical chunk with <code>git add</code>.</li>
+    <li><strong>Commit</strong> the snapshot to the repository.</li>
+    <li><strong>Branch</strong>, <strong>merge</strong>, <strong>rebase</strong> to organize history.</li>
+    <li><strong>Push</strong> to a remote so others can <strong>pull</strong>.</li>
+  </ol>
+
+  <h3>Git vs. GitHub</h3>
+  <p>Git is the engine — runs locally, no network needed, written by Linus Torvalds in 2005. GitHub is a hosting service built around Git that adds pull requests, issues, code review, and CI. You can use Git without GitHub. You cannot use GitHub without Git.</p>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control" target="_blank" rel="noopener">Pro Git — about VCS</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects" target="_blank" rel="noopener">Pro Git — Git objects</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/gitglossary" target="_blank" rel="noopener">Git glossary</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/giteveryday" target="_blank" rel="noopener">Git everyday commands</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 02 INSTALL ============ -->
+<section id="install">
+  <div class="section-head">
+    <div class="section-num">02</div>
+    <h2>Install &amp; identity<span class="sub">first ten minutes on a new machine</span></h2>
+  </div>
+
+  <p>Pick the right installer for your OS, set your identity once globally, and configure a sane default editor and branch name. Skipping these steps now means fixing wrong-author commits later.</p>
+
+  <div class="grid-2">
+    <div>
+      <h4>macOS / Linux / Windows</h4>
+<pre><code><span class="c"># macOS — Homebrew (recommended)</span>
+brew install git
+brew upgrade git
+
+<span class="c"># macOS — built-in via Xcode CLT</span>
+xcode-select --install
+
+<span class="c"># Linux — Debian/Ubuntu</span>
+sudo apt update &amp;&amp; sudo apt install git
+
+<span class="c"># Linux — Fedora</span>
+sudo dnf install git
+
+<span class="c"># Linux — Arch</span>
+sudo pacman -S git
+
+<span class="c"># Windows — winget</span>
+winget install --id Git.Git -e
+
+<span class="c"># Windows — Chocolatey / Scoop</span>
+choco install git
+scoop install git
+
+<span class="c"># Verify</span>
+git --version</code></pre>
+
+      <h4>Optional — GitHub CLI</h4>
+<pre><code><span class="c"># macOS</span>
+brew install gh
+
+<span class="c"># Windows</span>
+winget install --id GitHub.cli
+
+<span class="c"># Linux — Debian/Ubuntu</span>
+sudo apt install gh
+
+<span class="c"># First-time auth (HTTPS, browser flow)</span>
+gh auth login</code></pre>
+    </div>
+    <div>
+      <h4>One-time identity setup</h4>
+<pre><code><span class="c"># Set globally — applies to all repos</span>
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
+<span class="c"># Verify</span>
+git config --global --list
+
+<span class="c"># Per-repo override (work vs. personal)</span>
+cd /path/to/work-repo
+git config user.email "you@company.com"</code></pre>
+
+      <h4>Sane defaults worth setting once</h4>
+<pre><code><span class="c"># Use 'main' for new repos (matches GitHub default)</span>
+git config --global init.defaultBranch main
+
+<span class="c"># Default editor</span>
+git config --global core.editor "code --wait"     <span class="c"># VS Code</span>
+git config --global core.editor "vim"             <span class="c"># Vim</span>
+git config --global core.editor "nano"            <span class="c"># Nano</span>
+
+<span class="c"># Pull = fast-forward only (avoid noisy merge commits)</span>
+git config --global pull.ff only
+
+<span class="c"># Auto-prune deleted remote branches on fetch</span>
+git config --global fetch.prune true
+
+<span class="c"># Color in terminal output</span>
+git config --global color.ui auto
+
+<span class="c"># Better diffs (zdiff3 shows base + ours + theirs)</span>
+git config --global merge.conflictStyle zdiff3
+
+<span class="c"># Reuse recorded conflict resolutions</span>
+git config --global rerere.enabled true</code></pre>
+
+      <div class="note git">
+        <span class="label">Pro tip</span>
+        Run <code>git config --global --edit</code> to open <code>~/.gitconfig</code> directly. Easier than typing <code>git config --global x.y z</code> for every setting.
+      </div>
+    </div>
+  </div>
+
+  <h3>SSH keys for GitHub</h3>
+<pre><code><span class="c"># Generate ed25519 key (modern; preferred over RSA)</span>
+ssh-keygen -t ed25519 -C "you@example.com"
+
+<span class="c"># Start agent and add key</span>
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+<span class="c"># Copy public key to clipboard</span>
+pbcopy &lt; ~/.ssh/id_ed25519.pub        <span class="c"># macOS</span>
+xclip -sel clip &lt; ~/.ssh/id_ed25519.pub  <span class="c"># Linux</span>
+cat ~/.ssh/id_ed25519.pub | clip       <span class="c"># Windows</span>
+
+<span class="c"># Add to GitHub via CLI (no browser needed)</span>
+gh ssh-key add ~/.ssh/id_ed25519.pub --title "laptop"
+
+<span class="c"># Test the connection</span>
+ssh -T git@github.com</code></pre>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/downloads" target="_blank" rel="noopener">Git downloads</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-config" target="_blank" rel="noopener">git-config reference</a></li>
+      <li><a class="ref" href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh" target="_blank" rel="noopener">GitHub SSH setup</a></li>
+      <li><a class="ref" href="https://cli.github.com/manual/" target="_blank" rel="noopener">GitHub CLI manual</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 03 REPO ESSENTIALS ============ -->
+<section id="essentials">
+  <div class="section-head">
+    <div class="section-num">03</div>
+    <h2>Repo essentials<span class="sub">creating, cloning, and the .git folder</span></h2>
+  </div>
+
+  <p>Three ways to land in a repo: <code>init</code> a new one, <code>clone</code> someone else's, or <code>cd</code> into a folder that already has a <code>.git</code>. Every other command fans out from there.</p>
+
+  <div class="grid-2">
+    <div>
+      <h4>Create or clone</h4>
+<pre><code><span class="c"># Initialize an empty repo in current directory</span>
+git init
+
+<span class="c"># Initialize with a specific default branch</span>
+git init --initial-branch=main
+git init -b main
+
+<span class="c"># Clone over HTTPS</span>
+git clone https://github.com/owner/repo.git
+
+<span class="c"># Clone over SSH (preferred for write access)</span>
+git clone git@github.com:owner/repo.git
+
+<span class="c"># Clone into a custom directory name</span>
+git clone &lt;url&gt; my-folder
+
+<span class="c"># Shallow clone — fetch only last N commits (faster)</span>
+git clone --depth 1 &lt;url&gt;
+
+<span class="c"># Single-branch shallow (CI-friendly)</span>
+git clone --depth 1 --single-branch --branch main &lt;url&gt;
+
+<span class="c"># Partial clone — defer blob downloads</span>
+git clone --filter=blob:none &lt;url&gt;
+
+<span class="c"># Clone with submodules in one step</span>
+git clone --recurse-submodules &lt;url&gt;</code></pre>
+    </div>
+    <div>
+      <h4>Repo health checks</h4>
+<pre><code><span class="c"># Where is the repo root? (works from any subdir)</span>
+git rev-parse --show-toplevel
+
+<span class="c"># Are we in a repo at all?</span>
+git rev-parse --is-inside-work-tree
+
+<span class="c"># Working tree status</span>
+git status              <span class="c"># full</span>
+git status -s           <span class="c"># short / porcelain</span>
+git status -sb          <span class="c"># short + branch info</span>
+
+<span class="c"># Verify object database integrity</span>
+git fsck --full
+
+<span class="c"># Pack and prune unreachable objects</span>
+git gc                   <span class="c"># normal</span>
+git gc --aggressive      <span class="c"># slower, deeper packing</span>
+
+<span class="c"># Repo size on disk</span>
+git count-objects -vH</code></pre>
+
+      <h4>What's inside <code>.git/</code></h4>
+      <table>
+        <tr><td>HEAD</td><td>Pointer to the current branch ref</td></tr>
+        <tr><td>config</td><td>Per-repo configuration</td></tr>
+        <tr><td>index</td><td>The staging area</td></tr>
+        <tr><td>objects/</td><td>All blobs, trees, commits, tags</td></tr>
+        <tr><td>refs/heads/</td><td>Local branch pointers</td></tr>
+        <tr><td>refs/remotes/</td><td>Remote-tracking branches</td></tr>
+        <tr><td>refs/tags/</td><td>Tag pointers</td></tr>
+        <tr><td>logs/</td><td>Reflog history</td></tr>
+        <tr><td>hooks/</td><td>Sample hook scripts</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="label">Never edit <code>.git/</code> by hand</span>
+    The contents are managed by Git plumbing commands. Manual edits can corrupt the repo. Use <code>git update-ref</code>, <code>git symbolic-ref</code>, and <code>git config</code> instead.
+  </div>
+
+  <h3>The .gitignore file</h3>
+<pre><code><span class="c"># Logs &amp; runtime</span>
+*.log
+*.pid
+
+<span class="c"># Dependencies</span>
+node_modules/
+vendor/
+.venv/
+
+<span class="c"># Build output</span>
+dist/
+build/
+*.exe
+
+<span class="c"># OS noise</span>
+.DS_Store
+Thumbs.db
+
+<span class="c"># Editor / IDE</span>
+.vscode/
+.idea/
+*.swp
+
+<span class="c"># Secrets — NEVER commit these</span>
+.env
+.env.local
+*.key
+*.pem</code></pre>
+
+  <p>Already-tracked files are <em>not</em> retroactively ignored. To ignore something already committed:</p>
+
+<pre><code><span class="c"># Stop tracking but keep the file on disk</span>
+git rm --cached path/to/file
+git commit -m "stop tracking file"</code></pre>
+
+  <p>For machine-local ignores that shouldn't be shared with the team, edit <code>.git/info/exclude</code> instead of <code>.gitignore</code>.</p>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-init" target="_blank" rel="noopener">git-init</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-clone" target="_blank" rel="noopener">git-clone</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/gitignore" target="_blank" rel="noopener">gitignore reference</a></li>
+      <li><a class="ref" href="https://github.com/github/gitignore" target="_blank" rel="noopener">GitHub gitignore templates</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 04 STAGING & COMMITTING ============ -->
+<section id="staging">
+  <div class="section-head">
+    <div class="section-num">04</div>
+    <h2>Staging &amp; committing<span class="sub">crafting atomic, intentional snapshots</span></h2>
+  </div>
+
+  <p class="lede">A commit should be one logical change. Stage with surgical care; commit messages outlive the code.</p>
+
+  <h3>Staging files</h3>
+  <table class="wide">
+    <tr><td>git add &lt;path&gt;</td><td>Stage a specific file or directory</td></tr>
+    <tr><td>git add .</td><td>Stage everything in the current directory and below</td></tr>
+    <tr><td>git add -A</td><td>Stage all changes in the entire working tree (incl. deletions)</td></tr>
+    <tr><td>git add -u</td><td>Stage modifications + deletions of <em>tracked</em> files only</td></tr>
+    <tr><td>git add -p</td><td><strong>Patch mode</strong> — interactively pick hunks to stage</td></tr>
+    <tr><td>git add -i</td><td>Full interactive staging menu</td></tr>
+    <tr><td>git add -N &lt;path&gt;</td><td>Track an empty/new file without staging contents (intent-to-add)</td></tr>
+  </table>
+
+  <h3>Committing</h3>
+  <table class="wide">
+    <tr><td>git commit</td><td>Open editor for a commit message</td></tr>
+    <tr><td>git commit -m "msg"</td><td>Inline commit message</td></tr>
+    <tr><td>git commit -m "subject" -m "body"</td><td>Subject + body (two paragraphs)</td></tr>
+    <tr><td>git commit -a -m "msg"</td><td>Stage all <em>tracked</em> changes and commit in one step</td></tr>
+    <tr><td>git commit --amend</td><td>Replace last commit (message + new staged changes)</td></tr>
+    <tr><td>git commit --amend --no-edit</td><td>Re-commit without changing the message (e.g. add forgotten file)</td></tr>
+    <tr><td>git commit --fixup &lt;sha&gt;</td><td>Auto-targeted fix commit for later <code>rebase --autosquash</code></td></tr>
+    <tr><td>git commit --squash &lt;sha&gt;</td><td>Same as <code>--fixup</code> but keeps the message editable</td></tr>
+    <tr><td>git commit --allow-empty</td><td>Empty commit (useful as a CI trigger)</td></tr>
+    <tr><td>git commit -S -m "msg"</td><td>GPG/SSH-signed commit</td></tr>
+  </table>
+
+  <h3>Patch-mode workflow <span class="tag tip">Pro</span></h3>
+<pre><code><span class="c"># Step into hunks one at a time</span>
+git add -p
+
+<span class="c"># Inside the prompt:</span>
+<span class="c">#   y - stage this hunk        n - skip it</span>
+<span class="c">#   s - split into smaller     e - edit hunk by hand</span>
+<span class="c">#   q - quit                   ? - help</span></code></pre>
+
+  <p>Patch mode is how you turn a messy day's worth of changes into a clean sequence of atomic commits without abandoning work.</p>
+
+  <h3>Conventional Commits — recommended message format</h3>
+<pre><code><span class="v">type</span>(<span class="s">scope</span>)<span class="v">!</span>: <span class="v">subject</span>
+
+[optional body]
+
+[optional footer(s)]</code></pre>
+
+  <table>
+    <tr><td>feat</td><td>New user-facing feature</td></tr>
+    <tr><td>fix</td><td>Bug fix</td></tr>
+    <tr><td>docs</td><td>Documentation only</td></tr>
+    <tr><td>style</td><td>Formatting, no code change</td></tr>
+    <tr><td>refactor</td><td>Code change that neither fixes a bug nor adds a feature</td></tr>
+    <tr><td>perf</td><td>Performance improvement</td></tr>
+    <tr><td>test</td><td>Adding or fixing tests</td></tr>
+    <tr><td>build</td><td>Build system / dependency change</td></tr>
+    <tr><td>ci</td><td>CI configuration change</td></tr>
+    <tr><td>chore</td><td>Tooling / housekeeping</td></tr>
+    <tr><td>revert</td><td>Reverts a previous commit</td></tr>
+  </table>
+
+  <p>Append <code>!</code> after the type/scope to flag a breaking change: <code>feat(api)!: drop /v1 endpoints</code>. The <a class="ref" href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits spec</a> drives changelog generators (<code>commitizen</code>, <code>standard-version</code>, <code>release-please</code>) and semver automation.</p>
+
+  <h3>Commit message — the seven rules</h3>
+  <ul class="plain">
+    <li>Separate subject from body with a blank line.</li>
+    <li>Limit subject to <strong>50 chars</strong>; wrap body at <strong>72</strong>.</li>
+    <li>Capitalize the subject line.</li>
+    <li>Don't end the subject with a period.</li>
+    <li>Use the <em>imperative</em> mood: "Add login button", not "Added" or "Adds".</li>
+    <li>Body explains <em>what</em> and <em>why</em>, not <em>how</em>.</li>
+    <li>Reference issues / PRs in the footer (<code>Closes #123</code>).</li>
+  </ul>
+
+  <div class="note git">
+    <span class="label">Atomic commits</span>
+    A commit should answer one question: "what does this change do?" If the answer needs an "and", split it. Atomic commits make <code>git bisect</code>, <code>git revert</code>, and code review dramatically more useful.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-add" target="_blank" rel="noopener">git-add</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-commit" target="_blank" rel="noopener">git-commit</a></li>
+      <li><a class="ref" href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank" rel="noopener">Conventional Commits 1.0</a></li>
+      <li><a class="ref" href="https://cbea.ms/git-commit/" target="_blank" rel="noopener">Chris Beams — How to write a commit message</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 05 HISTORY ============ -->
+<section id="history">
+  <div class="section-head">
+    <div class="section-num">05</div>
+    <h2>History &amp; inspection<span class="sub">reading the story your repo tells</span></h2>
+  </div>
+
+  <p><code>git log</code> alone is configurable enough to replace half of what most people use GUIs for. Learn five flags and you'll never need a separate tool.</p>
+
+  <h3>The essential log incantations</h3>
+<pre><code><span class="c"># Default — newest first, full message</span>
+git log
+
+<span class="c"># One-liner per commit</span>
+git log --oneline
+
+<span class="c"># Branchy ASCII graph (worth aliasing)</span>
+git log --oneline --graph --all --decorate
+
+<span class="c"># Show files changed in each commit</span>
+git log --stat
+
+<span class="c"># Show full patches</span>
+git log -p
+
+<span class="c"># Limit number of commits</span>
+git log -n 5
+
+<span class="c"># Filter by author</span>
+git log --author="Dimitris"
+
+<span class="c"># Filter by message content</span>
+git log --grep="fix login"
+
+<span class="c"># Filter by content change (pickaxe)</span>
+git log -S "function deprecated_thing"
+
+<span class="c"># Filter by date</span>
+git log --since="2 weeks ago" --until="yesterday"
+
+<span class="c"># Files changed only in a specific path</span>
+git log -- path/to/file
+git log --follow -- path/to/file   <span class="c"># follow renames</span>
+
+<span class="c"># Pretty custom format</span>
+git log --pretty=format:"%h %ad | %s%d [%an]" --date=short</code></pre>
+
+  <h3>Inspect a single commit</h3>
+  <table class="wide">
+    <tr><td>git show &lt;sha&gt;</td><td>Show metadata + full patch for a commit</td></tr>
+    <tr><td>git show &lt;sha&gt; --stat</td><td>Just the file-change summary</td></tr>
+    <tr><td>git show &lt;sha&gt;:path/to/file</td><td>Show a file's contents at that commit</td></tr>
+    <tr><td>git show HEAD~3</td><td>Three commits before HEAD</td></tr>
+    <tr><td>git show HEAD^^</td><td>Two commits before HEAD (alt syntax)</td></tr>
+    <tr><td>git show &lt;branch&gt;:&lt;path&gt;</td><td>File content from another branch — no checkout needed</td></tr>
+  </table>
+
+  <h3>Who changed what — <code>blame</code> and friends</h3>
+<pre><code><span class="c"># Line-by-line authorship</span>
+git blame path/to/file
+
+<span class="c"># Limit to a line range</span>
+git blame -L 50,80 path/to/file
+
+<span class="c"># Ignore whitespace-only changes</span>
+git blame -w path/to/file
+
+<span class="c"># Detect moved/copied lines (slower, more accurate)</span>
+git blame -C -C path/to/file
+
+<span class="c"># Ignore noisy reformatting commits</span>
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+git blame --ignore-revs-file=.git-blame-ignore-revs path/to/file</code></pre>
+
+  <h3>Refspec shorthand cheat-sheet</h3>
+  <table>
+    <tr><td>HEAD</td><td>Currently checked-out commit</td></tr>
+    <tr><td>HEAD~3</td><td>Three commits back along first parent</td></tr>
+    <tr><td>HEAD^</td><td>First parent of HEAD (= HEAD~1)</td></tr>
+    <tr><td>HEAD^2</td><td>Second parent (the merged-in branch tip)</td></tr>
+    <tr><td>main..feature</td><td>Commits in <code>feature</code> but not in <code>main</code></td></tr>
+    <tr><td>main...feature</td><td>Symmetric difference (either side, but not both)</td></tr>
+    <tr><td>@{-1}</td><td>Previously checked-out branch</td></tr>
+    <tr><td>@{u} or @{upstream}</td><td>Upstream tracking branch</td></tr>
+    <tr><td>@{push}</td><td>The branch this would push to</td></tr>
+    <tr><td>main@{yesterday}</td><td><code>main</code> as of yesterday (uses reflog)</td></tr>
+  </table>
+
+  <h3>Bisect — binary-search for the breaking commit</h3>
+<pre><code>git bisect start
+git bisect bad                <span class="c"># current commit is broken</span>
+git bisect good v1.4.0        <span class="c"># this older tag was fine</span>
+
+<span class="c"># Git checks out the midpoint commit. Run your test, then mark:</span>
+git bisect bad        <span class="c"># or  git bisect good</span>
+
+<span class="c"># Repeat until Git prints "&lt;sha&gt; is the first bad commit"</span>
+git bisect reset      <span class="c"># return to where you started</span>
+
+<span class="c"># Fully automated with a test script (exits 0/1 = good/bad)</span>
+git bisect run ./test.sh</code></pre>
+
+  <div class="note git">
+    <span class="label">Bisect reality check</span>
+    Bisect's power is in <code>bisect run</code> + atomic commits. With a 1-line test script and clean history, you can find a breaking commit out of 1,000 in ~10 steps automatically.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-log" target="_blank" rel="noopener">git-log</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-show" target="_blank" rel="noopener">git-show</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-blame" target="_blank" rel="noopener">git-blame</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-bisect" target="_blank" rel="noopener">git-bisect</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/gitrevisions" target="_blank" rel="noopener">gitrevisions — refspec syntax</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 06 DIFF ============ -->
+<section id="diff">
+  <div class="section-head">
+    <div class="section-num">06</div>
+    <h2>Diff &amp; comparison<span class="sub">what changed, where, and against what</span></h2>
+  </div>
+
+  <p>Every <code>git diff</code> answers one question: <em>what's different between A and B?</em> A and B can be the working tree, the index, a commit, a branch, or a tag. Knowing which two things you're comparing is the whole game.</p>
+
+  <h3>The four canonical diffs</h3>
+  <table class="wide">
+    <tr><th>Command</th><th>Compares</th></tr>
+    <tr><td>git diff</td><td>Working tree vs. index (unstaged changes)</td></tr>
+    <tr><td>git diff --staged</td><td>Index vs. HEAD (staged changes — a preview of the next commit)</td></tr>
+    <tr><td>git diff HEAD</td><td>Working tree vs. HEAD (everything not yet committed)</td></tr>
+    <tr><td>git diff &lt;A&gt; &lt;B&gt;</td><td>Any two commits, branches, or tags</td></tr>
+  </table>
+
+  <p><code>--cached</code> is an alias for <code>--staged</code>. Both work the same way; modern Git prefers <code>--staged</code>.</p>
+
+  <h3>Useful narrowing</h3>
+<pre><code><span class="c"># Diff a single file</span>
+git diff -- path/to/file
+
+<span class="c"># Diff two branches</span>
+git diff main..feature
+
+<span class="c"># Just the file names that differ</span>
+git diff --name-only main..feature
+
+<span class="c"># File names + add/delete/modify status</span>
+git diff --name-status main..feature
+
+<span class="c"># Per-file change summary</span>
+git diff --stat HEAD~5
+
+<span class="c"># Word-level instead of line-level diff</span>
+git diff --word-diff
+
+<span class="c"># Ignore whitespace</span>
+git diff -w
+git diff --ignore-all-space
+
+<span class="c"># Show inter-hunk context (default 3 lines)</span>
+git diff -U10            <span class="c"># 10 lines of context</span></code></pre>
+
+  <h3>Reading a diff</h3>
+<pre><code><span class="c">diff --git a/file.txt b/file.txt</span>
+<span class="c">index e69de29..d95f3ad 100644</span>
+<span class="c">--- a/file.txt          // 'a' = old version</span>
+<span class="c">+++ b/file.txt          // 'b' = new version</span>
+<span class="c">@@ -1,3 +1,4 @@         // hunk header: -old_start,old_count +new_start,new_count</span>
+ unchanged line
+<span class="r">-removed line</span>
+<span class="n">+added line</span>
+<span class="n">+another added line</span>
+ unchanged line</code></pre>
+
+  <h3>Range-diff — "what changed about my changes?" <span class="tag modern">Modern</span></h3>
+<pre><code><span class="c"># Compare two versions of the SAME branch (e.g. before/after rebase)</span>
+git range-diff main..feature@{1} main..feature
+
+<span class="c"># Compare two patch series</span>
+git range-diff &lt;base1&gt;..&lt;tip1&gt; &lt;base2&gt;..&lt;tip2&gt;</code></pre>
+
+  <p><code>git range-diff</code> is invaluable for code review when a PR has been force-pushed: it shows what changed between iterations, not just the latest version.</p>
+
+  <h3>Diff tools — visualizing in your editor</h3>
+<pre><code><span class="c"># Configure VS Code as your diff tool</span>
+git config --global diff.tool vscode
+git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
+
+<span class="c"># Run the configured diff tool</span>
+git difftool
+
+<span class="c"># Skip the "are you sure?" prompt</span>
+git difftool --no-prompt</code></pre>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-diff" target="_blank" rel="noopener">git-diff</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-range-diff" target="_blank" rel="noopener">git-range-diff</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-difftool" target="_blank" rel="noopener">git-difftool</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 07 UNDO ============ -->
+<section id="undo">
+  <div class="section-head">
+    <div class="section-num">07</div>
+    <h2>Undoing changes<span class="sub">restore · revert · reset · the modern way</span></h2>
+  </div>
+
+  <p class="lede">Modern Git splits "undo" into three commands with three clear domains: <code>restore</code> for files, <code>revert</code> for committed history that's been shared, <code>reset</code> for committed history that's still local. Pick the right one and you'll never lose work.</p>
+
+  <div class="note git">
+    <span class="label">Decision tree</span>
+    Want to throw away uncommitted work? → <code>git restore</code>. Need to undo a published commit safely? → <code>git revert</code>. Need to rewind local history before pushing? → <code>git reset</code>. Already pushed and need to rewind anyway? → <code>git reset</code> + <code>git push --force-with-lease</code> (and tell your team).
+  </div>
+
+  <h3>git restore — undo file-level changes <span class="tag modern">Modern</span></h3>
+  <p>Replaces the file-restoring half of legacy <code>git checkout</code>. Cleaner, less overloaded, harder to misuse.</p>
+
+  <table class="wide">
+    <tr><td>git restore &lt;file&gt;</td><td>Discard <em>unstaged</em> changes — restore from index</td></tr>
+    <tr><td>git restore --staged &lt;file&gt;</td><td>Unstage a file (keep working-tree changes)</td></tr>
+    <tr><td>git restore --staged --worktree &lt;file&gt;</td><td>Unstage <em>and</em> discard working-tree changes</td></tr>
+    <tr><td>git restore --source=HEAD~3 &lt;file&gt;</td><td>Restore file's content from a specific commit</td></tr>
+    <tr><td>git restore --source=&lt;branch&gt; &lt;file&gt;</td><td>Restore from another branch — no switching</td></tr>
+    <tr><td>git restore -p &lt;file&gt;</td><td>Patch mode — pick which hunks to discard</td></tr>
+    <tr><td>git restore .</td><td>Restore everything in the current directory</td></tr>
+  </table>
+
+  <div class="note danger">
+    <span class="label">Destructive</span>
+    <code>git restore &lt;file&gt;</code> overwrites uncommitted changes in the working tree. Once gone, they are <em>not</em> in the reflog. Stash first if uncertain: <code>git stash push -m "before restore"</code>.
+  </div>
+
+  <h3>git revert — undo a commit by adding a new one</h3>
+  <p>Safe for shared/pushed history. Creates a new commit that undoes the changes of the target commit, leaving original history intact.</p>
+
+<pre><code><span class="c"># Revert a single commit (opens editor for message)</span>
+git revert &lt;sha&gt;
+
+<span class="c"># Revert without committing — leaves changes staged</span>
+git revert -n &lt;sha&gt;
+
+<span class="c"># Revert a range (newer first, in reverse)</span>
+git revert HEAD~3..HEAD
+
+<span class="c"># Revert a merge commit — must specify which parent's history to keep</span>
+git revert -m 1 &lt;merge-sha&gt;
+
+<span class="c"># Abort an in-progress revert</span>
+git revert --abort
+git revert --continue
+git revert --skip</code></pre>
+
+  <h3>git reset — rewind local history <span class="tag danger">Local only</span></h3>
+  <p>Three modes — same target, different effect on your working tree and index:</p>
+
+  <table class="wide">
+    <tr><th>Mode</th><th>HEAD</th><th>Index</th><th>Working tree</th></tr>
+    <tr><td>--soft</td><td>moves</td><td>untouched</td><td>untouched</td></tr>
+    <tr><td>--mixed (default)</td><td>moves</td><td>resets</td><td>untouched</td></tr>
+    <tr><td>--hard</td><td>moves</td><td>resets</td><td>resets <span class="tag danger">data loss</span></td></tr>
+  </table>
+
+<pre><code><span class="c"># Unstage a file (mixed reset of one file)</span>
+git reset HEAD path/to/file
+<span class="c"># &mdash;or, more clearly, the modern equivalent &mdash;</span>
+git restore --staged path/to/file
+
+<span class="c"># Undo last commit, keep changes staged</span>
+git reset --soft HEAD~1
+
+<span class="c"># Undo last commit, keep changes in working tree (unstaged)</span>
+git reset HEAD~1
+git reset --mixed HEAD~1     <span class="c"># same thing, explicit</span>
+
+<span class="c"># Nuke last commit AND its changes &mdash; gone from working tree</span>
+git reset --hard HEAD~1
+
+<span class="c"># Reset current branch to match remote exactly</span>
+git fetch origin
+git reset --hard origin/main</code></pre>
+
+  <div class="note danger">
+    <span class="label">--hard reset</span>
+    A hard reset deletes uncommitted work in the working tree with no warning. The reflog will save committed work for ~90 days, but uncommitted changes are gone forever. Stash first if there's any doubt.
+  </div>
+
+  <h3>The decision matrix</h3>
+  <table class="wide">
+    <tr><th>I want to…</th><th>Use</th></tr>
+    <tr><td>Discard one file's unstaged edits</td><td><code>git restore &lt;file&gt;</code></td></tr>
+    <tr><td>Unstage a file</td><td><code>git restore --staged &lt;file&gt;</code></td></tr>
+    <tr><td>Undo last commit, keep changes</td><td><code>git reset --soft HEAD~1</code></td></tr>
+    <tr><td>Throw away last 3 commits entirely</td><td><code>git reset --hard HEAD~3</code> (local only)</td></tr>
+    <tr><td>Undo a commit that's been pushed</td><td><code>git revert &lt;sha&gt;</code></td></tr>
+    <tr><td>Fix the message of the last commit</td><td><code>git commit --amend</code></td></tr>
+    <tr><td>Add forgotten file to last commit</td><td><code>git add &lt;file&gt; &amp;&amp; git commit --amend --no-edit</code></td></tr>
+    <tr><td>Rewrite older commits in series</td><td><code>git rebase -i &lt;base&gt;</code></td></tr>
+    <tr><td>Recover a "lost" commit</td><td><code>git reflog</code> + <code>git reset --hard &lt;sha&gt;</code></td></tr>
+  </table>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-restore" target="_blank" rel="noopener">git-restore</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-revert" target="_blank" rel="noopener">git-revert</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-reset" target="_blank" rel="noopener">git-reset</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 08 BRANCHING ============ -->
+<section id="branching">
+  <div class="section-head">
+    <div class="section-num">08</div>
+    <h2>Branching<span class="sub">cheap pointers, infinite parallel timelines</span></h2>
+  </div>
+
+  <p>A branch is a 41-byte text file containing a SHA. Creating one is instant. Deleting one is reversible (within reflog window). This cheapness is why Git workflows revolve around them.</p>
+
+  <h3>Modern branching with git switch <span class="tag modern">Modern</span></h3>
+  <p><code>git switch</code> handles only branch movement — clearer and safer than legacy <code>git checkout</code>.</p>
+
+  <table class="wide">
+    <tr><td>git switch &lt;branch&gt;</td><td>Switch to existing branch</td></tr>
+    <tr><td>git switch -c &lt;new-branch&gt;</td><td>Create &amp; switch to new branch from HEAD</td></tr>
+    <tr><td>git switch -c &lt;new&gt; &lt;start-point&gt;</td><td>Branch from any commit/branch/tag</td></tr>
+    <tr><td>git switch -C &lt;branch&gt;</td><td>Force-create (resets if it already exists)</td></tr>
+    <tr><td>git switch -</td><td>Toggle to previous branch (like <code>cd -</code>)</td></tr>
+    <tr><td>git switch --detach &lt;sha&gt;</td><td>Detached HEAD — inspect a commit</td></tr>
+    <tr><td>git switch --guess &lt;name&gt;</td><td>Auto-create local branch tracking a remote of the same name</td></tr>
+    <tr><td>git switch -m &lt;branch&gt;</td><td>Switch and 3-way merge local changes</td></tr>
+    <tr><td>git switch --discard-changes &lt;branch&gt;</td><td>Force-switch, throwing away local edits</td></tr>
+  </table>
+
+  <h3>Branch listing &amp; management</h3>
+  <table class="wide">
+    <tr><td>git branch</td><td>List local branches (current marked with *)</td></tr>
+    <tr><td>git branch -a</td><td>List all branches — local + remote-tracking</td></tr>
+    <tr><td>git branch -r</td><td>List remote-tracking branches only</td></tr>
+    <tr><td>git branch -v</td><td>List with last commit SHA + subject</td></tr>
+    <tr><td>git branch -vv</td><td>Same as <code>-v</code> + upstream tracking info</td></tr>
+    <tr><td>git branch --merged</td><td>Branches fully merged into current</td></tr>
+    <tr><td>git branch --no-merged</td><td>Branches with unmerged work — careful before deleting</td></tr>
+    <tr><td>git branch -d &lt;name&gt;</td><td>Delete (refuses if unmerged)</td></tr>
+    <tr><td>git branch -D &lt;name&gt;</td><td>Force-delete (loses unmerged commits — recoverable via reflog)</td></tr>
+    <tr><td>git branch -m &lt;old&gt; &lt;new&gt;</td><td>Rename a branch</td></tr>
+    <tr><td>git branch -m &lt;new&gt;</td><td>Rename current branch</td></tr>
+    <tr><td>git branch --set-upstream-to=origin/main</td><td>Set tracking branch</td></tr>
+    <tr><td>git branch --unset-upstream</td><td>Remove tracking</td></tr>
+  </table>
+
+  <h3>HEAD — the moving finger</h3>
+  <p><code>HEAD</code> is a pointer to the current branch (which itself points to a commit). When you commit, the branch advances and HEAD goes along for the ride.</p>
+
+  <p>A <strong>detached HEAD</strong> means HEAD points directly to a commit instead of a branch. New commits made there are <em>orphaned</em> — they belong to no branch and will eventually be garbage-collected. Always either return to a real branch or convert the detached state into a new branch:</p>
+
+<pre><code><span class="c"># Detached state — exploring an old commit</span>
+git switch --detach v1.2.0
+
+<span class="c"># Make some experimental commits...</span>
+
+<span class="c"># Save them by creating a branch HERE</span>
+git switch -c experimental
+
+<span class="c"># Or discard and return to safety</span>
+git switch -          <span class="c"># back to where you were</span>
+git switch main</code></pre>
+
+  <h3>Renaming the default branch master → main</h3>
+<pre><code><span class="c"># Rename locally</span>
+git branch -m master main
+
+<span class="c"># Push the new branch and set its upstream</span>
+git push -u origin main
+
+<span class="c"># Update HEAD on the remote (then change default in GitHub UI/CLI)</span>
+gh repo edit --default-branch main
+
+<span class="c"># Delete the old remote branch</span>
+git push origin --delete master</code></pre>
+
+  <div class="note git">
+    <span class="label">Naming convention</span>
+    Use slash-separated prefixes: <code>feature/auth-oauth</code>, <code>fix/login-500</code>, <code>chore/upgrade-deps</code>. Most CI systems and GitHub branch protection patterns assume this. Avoid spaces, special chars, and uppercase.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-switch" target="_blank" rel="noopener">git-switch</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-branch" target="_blank" rel="noopener">git-branch</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows" target="_blank" rel="noopener">Pro Git — branching workflows</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 09 MERGING ============ -->
+<section id="merging">
+  <div class="section-head">
+    <div class="section-num">09</div>
+    <h2>Merging<span class="sub">fast-forward · 3-way · squash · the conflict dance</span></h2>
+  </div>
+
+  <p>Merging integrates one branch's history into another. The result depends on the shape of the history and the strategy you pick.</p>
+
+  <h3>Three merge shapes</h3>
+  <table class="wide">
+    <tr><th>Strategy</th><th>When it happens</th><th>History shape</th></tr>
+    <tr><td>Fast-forward</td><td>Target is a direct ancestor of source</td><td>Linear — branch pointer just slides</td></tr>
+    <tr><td>3-way merge</td><td>Both branches have new commits</td><td>Creates a <em>merge commit</em> with two parents</td></tr>
+    <tr><td>Squash merge</td><td>Explicitly requested with <code>--squash</code></td><td>One new commit, no merge parent — original branch unrelated</td></tr>
+  </table>
+
+  <h3>The merge commands</h3>
+  <table class="wide">
+    <tr><td>git merge &lt;branch&gt;</td><td>Merge <code>branch</code> into current</td></tr>
+    <tr><td>git merge --ff-only &lt;branch&gt;</td><td>Fast-forward only — fail if a merge commit would be needed</td></tr>
+    <tr><td>git merge --no-ff &lt;branch&gt;</td><td>Always create a merge commit, even when ff is possible</td></tr>
+    <tr><td>git merge --squash &lt;branch&gt;</td><td>Combine all changes into one staged change (you commit separately)</td></tr>
+    <tr><td>git merge --no-commit &lt;branch&gt;</td><td>Merge but don't auto-commit — review first</td></tr>
+    <tr><td>git merge --abort</td><td>Abandon a merge in progress, restore pre-merge state</td></tr>
+    <tr><td>git merge --continue</td><td>Resume after resolving conflicts</td></tr>
+  </table>
+
+  <h3>Typical feature-branch merge</h3>
+<pre><code><span class="c"># Update main</span>
+git switch main
+git pull
+
+<span class="c"># Merge feature into main</span>
+git merge feature/auth-oauth
+
+<span class="c"># Push the result</span>
+git push
+
+<span class="c"># Delete the feature branch (locally and remotely)</span>
+git branch -d feature/auth-oauth
+git push origin --delete feature/auth-oauth</code></pre>
+
+  <h3>Resolving merge conflicts</h3>
+  <p>When the same lines of the same file change on both sides, Git stops mid-merge and asks you to resolve. Files containing conflicts get markers:</p>
+
+<pre><code><span class="r">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+this is what's on the branch you're merging INTO
+<span class="c">||||||| merged common ancestor (with merge.conflictStyle=zdiff3)</span>
+this is the original
+<span class="c">=======</span>
+<span class="n">this is what's on the branch you're merging IN</span>
+<span class="n">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/auth</span></code></pre>
+
+<pre><code><span class="c"># 1. See which files have conflicts</span>
+git status
+
+<span class="c"># 2. Open each, edit to the desired final state, remove all markers</span>
+
+<span class="c"># 3. Stage resolved files</span>
+git add path/to/conflicted-file
+
+<span class="c"># 4. Once everything is staged, finalize the merge</span>
+git merge --continue
+<span class="c"># &mdash;or simply&mdash;</span>
+git commit
+
+<span class="c"># Bail out at any point</span>
+git merge --abort</code></pre>
+
+  <h3>Conflict-resolution helpers</h3>
+  <table class="wide">
+    <tr><td>git diff --name-only --diff-filter=U</td><td>List files with unresolved conflicts</td></tr>
+    <tr><td>git checkout --ours -- &lt;file&gt;</td><td>Keep our version (target branch's)</td></tr>
+    <tr><td>git checkout --theirs -- &lt;file&gt;</td><td>Keep their version (source branch's)</td></tr>
+    <tr><td>git mergetool</td><td>Launch configured visual merge tool</td></tr>
+    <tr><td>git config merge.conflictStyle zdiff3</td><td>Show base version in conflict markers — much more useful</td></tr>
+    <tr><td>git config rerere.enabled true</td><td><strong>Reuse Recorded Resolution</strong> — Git remembers conflict resolutions and replays them</td></tr>
+  </table>
+
+  <h3>Squash merge — when and why</h3>
+  <p>Squashing turns a feature branch's many WIP commits into one tidy commit on the target. Useful for noisy branches but loses the granular history. GitHub's "Squash and merge" PR option does this remotely.</p>
+
+<pre><code>git switch main
+git merge --squash feature/messy-branch
+git commit -m "feat(api): add bulk export endpoint"</code></pre>
+
+  <div class="note git">
+    <span class="label">No-ff for visibility</span>
+    Some teams configure <code>--no-ff</code> as default for merges <em>into</em> long-lived branches: it keeps a visible "this came from a feature branch" marker in the graph. Set it per-branch with <code>git config branch.main.mergeOptions --no-ff</code>.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-merge" target="_blank" rel="noopener">git-merge</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-mergetool" target="_blank" rel="noopener">git-mergetool</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-rerere" target="_blank" rel="noopener">git-rerere</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging" target="_blank" rel="noopener">Pro Git — basic merging</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 10 STASHING ============ -->
+<section id="stashing">
+  <div class="section-head">
+    <div class="section-num">10</div>
+    <h2>Stashing<span class="sub">put work aside without committing</span></h2>
+  </div>
+
+  <p>Stashes save uncommitted work to a stack you can pop later. Perfect for "I need to switch branches right now and don't want to commit half-baked changes."</p>
+
+  <h3>Core stash commands</h3>
+  <table class="wide">
+    <tr><td>git stash push</td><td>Stash tracked, modified files (default)</td></tr>
+    <tr><td>git stash push -m "msg"</td><td>Stash with a descriptive label</td></tr>
+    <tr><td>git stash push -u</td><td>Include <em>untracked</em> files</td></tr>
+    <tr><td>git stash push -a</td><td>Include untracked <em>and</em> ignored files</td></tr>
+    <tr><td>git stash push -p</td><td>Patch mode — pick hunks to stash</td></tr>
+    <tr><td>git stash push -k</td><td>Stash unstaged changes only, keep index intact</td></tr>
+    <tr><td>git stash push -- &lt;path&gt;</td><td>Stash only specific files</td></tr>
+    <tr><td>git stash list</td><td>Show all stashes</td></tr>
+    <tr><td>git stash show</td><td>Summary of latest stash</td></tr>
+    <tr><td>git stash show -p</td><td>Full patch for latest stash</td></tr>
+    <tr><td>git stash show -p stash@{2}</td><td>Patch for the 3rd stash</td></tr>
+    <tr><td>git stash pop</td><td>Apply latest stash + remove from list</td></tr>
+    <tr><td>git stash apply</td><td>Apply latest stash, keep it on the list</td></tr>
+    <tr><td>git stash apply stash@{1}</td><td>Apply a specific stash</td></tr>
+    <tr><td>git stash drop stash@{0}</td><td>Delete one stash</td></tr>
+    <tr><td>git stash clear</td><td>Delete all stashes — cannot be undone</td></tr>
+    <tr><td>git stash branch &lt;new-branch&gt;</td><td>Create a branch starting from the stash's parent &amp; apply it</td></tr>
+  </table>
+
+  <h3>Common stash recipes</h3>
+<pre><code><span class="c"># Quick switch — stash, branch, work, come back</span>
+git stash push -m "wip: refactoring auth"
+git switch hotfix/login
+<span class="c"># ...fix the hotfix, commit, push...</span>
+git switch -
+git stash pop
+
+<span class="c"># Stash including untracked .env.local you forgot</span>
+git stash push -u -m "wip with new env file"
+
+<span class="c"># Apply a specific old stash by index</span>
+git stash list
+<span class="c">#   stash@{0}: wip: third attempt</span>
+<span class="c">#   stash@{1}: wip: working version</span>
+<span class="c">#   stash@{2}: wip: original idea</span>
+git stash apply stash@{1}
+
+<span class="c"># Recover a "lost" pop &mdash; conflict bailout</span>
+git stash apply stash@{0}     <span class="c"># try again</span>
+
+<span class="c"># Convert stash into a real branch (keeps the stash)</span>
+git stash branch feature/from-stash stash@{0}</code></pre>
+
+  <div class="note warn">
+    <span class="label">pop vs. apply</span>
+    <code>pop</code> removes the stash from the list — and if you hit a conflict, the stash is <em>still</em> dropped and only its contents stay in your tree. Use <code>apply</code> when you might need a redo, <code>pop</code> when you're confident.
+  </div>
+
+  <div class="note">
+    <span class="label">Stashes ≠ commits</span>
+    Stashes live in <code>refs/stash</code> and are technically commits, but they're not on any branch. They survive across sessions but are <em>not</em> pushed to remotes. To share WIP, push to a real branch instead.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-stash" target="_blank" rel="noopener">git-stash</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning" target="_blank" rel="noopener">Pro Git — stashing and cleaning</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 11 REMOTES ============ -->
+<section id="remotes">
+  <div class="section-head">
+    <div class="section-num">11</div>
+    <h2>Remotes<span class="sub">named pointers to other copies of the repo</span></h2>
+  </div>
+
+  <p>A <strong>remote</strong> is just a nickname for a URL. <code>origin</code> is the conventional name for the repo you cloned from. <code>upstream</code> is the conventional name for the original repo when you've forked. Every Git operation that touches the network names a remote (sometimes implicitly).</p>
+
+  <h3>Managing remotes</h3>
+  <table class="wide">
+    <tr><td>git remote</td><td>List remote names</td></tr>
+    <tr><td>git remote -v</td><td>List with URLs (for fetch + for push)</td></tr>
+    <tr><td>git remote show origin</td><td>Detailed info: tracked branches, push targets, prune state</td></tr>
+    <tr><td>git remote add &lt;name&gt; &lt;url&gt;</td><td>Add a new remote</td></tr>
+    <tr><td>git remote rename &lt;old&gt; &lt;new&gt;</td><td>Rename</td></tr>
+    <tr><td>git remote remove &lt;name&gt;</td><td>Remove (also: <code>git remote rm</code>)</td></tr>
+    <tr><td>git remote set-url &lt;name&gt; &lt;url&gt;</td><td>Change a remote's URL</td></tr>
+    <tr><td>git remote set-url --push &lt;name&gt; &lt;url&gt;</td><td>Different URL for pushing only</td></tr>
+    <tr><td>git remote prune origin</td><td>Drop refs to deleted remote branches</td></tr>
+  </table>
+
+  <h3>Adding upstream after forking</h3>
+<pre><code><span class="c"># After cloning your fork:</span>
+git remote -v
+<span class="c"># origin  git@github.com:you/project.git (fetch)</span>
+<span class="c"># origin  git@github.com:you/project.git (push)</span>
+
+<span class="c"># Add the original repo as 'upstream'</span>
+git remote add upstream https://github.com/original/project.git
+
+<span class="c"># Verify</span>
+git remote -v
+
+<span class="c"># Sync from upstream periodically</span>
+git fetch upstream
+git switch main
+git merge upstream/main
+git push origin main</code></pre>
+
+  <h3>Switching protocols (HTTPS ↔ SSH)</h3>
+<pre><code><span class="c"># Currently HTTPS, switch to SSH</span>
+git remote set-url origin git@github.com:owner/repo.git
+
+<span class="c"># Currently SSH, switch to HTTPS</span>
+git remote set-url origin https://github.com/owner/repo.git</code></pre>
+
+  <h3>Pushing — local → remote</h3>
+  <table class="wide">
+    <tr><td>git push</td><td>Push current branch to its tracked upstream</td></tr>
+    <tr><td>git push origin main</td><td>Push <code>main</code> to <code>origin</code></td></tr>
+    <tr><td>git push -u origin &lt;branch&gt;</td><td><strong>First push</strong> — creates remote branch + sets up tracking</td></tr>
+    <tr><td>git push --all</td><td>Push every local branch</td></tr>
+    <tr><td>git push --tags</td><td>Push all tags</td></tr>
+    <tr><td>git push origin &lt;tag&gt;</td><td>Push one tag</td></tr>
+    <tr><td>git push --follow-tags</td><td>Push commits + annotated tags reachable from them</td></tr>
+    <tr><td>git push origin --delete &lt;branch&gt;</td><td>Delete the remote branch</td></tr>
+    <tr><td>git push --force-with-lease</td><td><strong>Safer force-push</strong> — fails if remote moved unexpectedly</td></tr>
+    <tr><td>git push --force</td><td>Plain force-push (dangerous on shared branches)</td></tr>
+    <tr><td>git push --dry-run</td><td>Show what would happen</td></tr>
+  </table>
+
+  <h3>Remote-tracking branches</h3>
+  <p>When you fetch, Git updates <em>remote-tracking branches</em>: read-only local pointers like <code>origin/main</code> that mirror the remote's state at last fetch. They are not the same as your local <code>main</code>.</p>
+
+  <table class="wide">
+    <tr><td>git branch -vv</td><td>Show local → upstream tracking config</td></tr>
+    <tr><td>git switch --track origin/feature</td><td>Create local <code>feature</code> tracking <code>origin/feature</code></td></tr>
+    <tr><td>git switch feature</td><td>Often the same — modern Git auto-creates tracking when names match</td></tr>
+    <tr><td>git push -u origin &lt;branch&gt;</td><td>Set up tracking on first push</td></tr>
+    <tr><td>git branch --set-upstream-to=origin/main main</td><td>Set tracking after the fact</td></tr>
+  </table>
+
+  <div class="note git">
+    <span class="label">--force-with-lease</span>
+    Always prefer <code>--force-with-lease</code> over <code>--force</code>. It refuses to overwrite if the remote has new commits you haven't seen — protects against accidentally clobbering a teammate's push.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-remote" target="_blank" rel="noopener">git-remote</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-push" target="_blank" rel="noopener">git-push</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes" target="_blank" rel="noopener">Pro Git — working with remotes</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 12 FETCH & PULL ============ -->
+<section id="fetch-pull">
+  <div class="section-head">
+    <div class="section-num">12</div>
+    <h2>Fetch &amp; pull<span class="sub">remote → local — the right way</span></h2>
+  </div>
+
+  <p class="lede"><code>fetch</code> is the safe inspection step. <code>pull</code> is fetch + integrate in one command. When in doubt, fetch first.</p>
+
+  <h3>git fetch — download without merging</h3>
+  <table class="wide">
+    <tr><td>git fetch</td><td>Fetch from default remote (usually <code>origin</code>)</td></tr>
+    <tr><td>git fetch origin</td><td>Fetch from a named remote</td></tr>
+    <tr><td>git fetch --all</td><td>Fetch from every remote</td></tr>
+    <tr><td>git fetch origin main</td><td>Fetch a specific branch</td></tr>
+    <tr><td>git fetch --tags</td><td>Also fetch new tags</td></tr>
+    <tr><td>git fetch --prune</td><td>Remove tracking refs for branches deleted on remote</td></tr>
+    <tr><td>git fetch --prune-tags</td><td>Also prune deleted tags</td></tr>
+    <tr><td>git fetch --depth=N</td><td>Limit fetch depth (shallow)</td></tr>
+    <tr><td>git fetch --unshallow</td><td>Convert a shallow clone to full</td></tr>
+  </table>
+
+  <h3>git pull — fetch + integrate</h3>
+  <p><code>git pull</code> is shorthand for two commands: <code>git fetch</code> then either <code>git merge</code> or <code>git rebase</code> depending on configuration.</p>
+
+  <table class="wide">
+    <tr><td>git pull</td><td>Default behavior (depends on <code>pull.rebase</code> / <code>pull.ff</code>)</td></tr>
+    <tr><td>git pull --ff-only</td><td>Only allow fast-forward; abort otherwise</td></tr>
+    <tr><td>git pull --no-ff</td><td>Always create a merge commit</td></tr>
+    <tr><td>git pull --rebase</td><td>Rebase local commits on top of remote, no merge commit</td></tr>
+    <tr><td>git pull --rebase=interactive</td><td>Rebase + open editor to reorder/squash</td></tr>
+    <tr><td>git pull --autostash</td><td>Auto-stash dirty tree before pulling, pop after</td></tr>
+  </table>
+
+  <h3>Recommended pull config</h3>
+<pre><code><span class="c"># Make pull fail loudly if a fast-forward isn't possible &mdash;</span>
+<span class="c"># forces an explicit merge or rebase decision.</span>
+git config --global pull.ff only
+
+<span class="c"># Always auto-prune deleted remote branches</span>
+git config --global fetch.prune true</code></pre>
+
+  <p>If you prefer rebase-by-default for cleaner history (and no merge bubbles on every pull):</p>
+
+<pre><code>git config --global pull.rebase true
+git config --global rebase.autoStash true</code></pre>
+
+  <h3>Pull with conflicts</h3>
+<pre><code><span class="c"># Merge-style conflict</span>
+git pull
+<span class="c"># &lt;CONFLICT messages&gt;</span>
+<span class="c"># Resolve files, stage, commit</span>
+git add &lt;resolved-files&gt;
+git commit
+
+<span class="c"># Rebase-style conflict</span>
+git pull --rebase
+<span class="c"># &lt;CONFLICT messages&gt;</span>
+git add &lt;resolved-files&gt;
+git rebase --continue
+<span class="c"># &mdash;or bail out&mdash;</span>
+git rebase --abort</code></pre>
+
+  <h3>fetch vs. pull — the rule of thumb</h3>
+  <table>
+    <tr><td>git fetch</td><td>Read-only inspection. Updates remote-tracking refs. Your branches don't move.</td></tr>
+    <tr><td>git pull</td><td>Fetch + integrate. Your branch moves. Possible conflicts.</td></tr>
+  </table>
+
+  <p>Use <code>git fetch</code> before reviewing what teammates have done; use <code>git pull</code> when you're ready to integrate.</p>
+
+  <div class="note git">
+    <span class="label">Read before pull</span>
+    Run <code>git fetch &amp;&amp; git log HEAD..origin/main --oneline</code> to see exactly what's coming before you pull. No surprises.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-fetch" target="_blank" rel="noopener">git-fetch</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-pull" target="_blank" rel="noopener">git-pull</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 13 REBASE ============ -->
+<section id="rebase">
+  <div class="section-head">
+    <div class="section-num">13</div>
+    <h2>Rebase<span class="sub">replay commits onto a new base — clean history, sharp edges</span></h2>
+  </div>
+
+  <p class="lede">Rebasing rewrites history by replaying commits one at a time onto a new base. Used wisely it produces beautiful linear history. Used carelessly it destroys collaborators' work.</p>
+
+  <h3>The rebase mental model</h3>
+  <p>Where <code>merge</code> joins two histories with a merge commit, <code>rebase</code> takes commits from one branch and re-applies them onto another, creating <em>new</em> commits with new SHAs. The original commits are abandoned (but recoverable via reflog).</p>
+
+  <div class="note danger">
+    <span class="label">The Golden Rule</span>
+    <strong>Never rebase commits that exist outside your local repository.</strong> Rebasing rewrites history; if anyone has based work on the original commits, you've broken their copy. Public branches (<code>main</code>, shared release branches) are off-limits. Your own un-pushed feature branch is fair game.
+  </div>
+
+  <h3>Basic rebase</h3>
+  <table class="wide">
+    <tr><td>git rebase &lt;base&gt;</td><td>Replay current branch's commits onto <code>base</code></td></tr>
+    <tr><td>git rebase main</td><td>Most common: bring feature branch up-to-date with main</td></tr>
+    <tr><td>git rebase --onto &lt;new-base&gt; &lt;old-base&gt;</td><td>Surgical: move a range of commits to a new parent</td></tr>
+    <tr><td>git rebase --continue</td><td>Resume after resolving conflicts</td></tr>
+    <tr><td>git rebase --abort</td><td>Bail out, restore pre-rebase state</td></tr>
+    <tr><td>git rebase --skip</td><td>Skip the conflicting commit entirely</td></tr>
+    <tr><td>git rebase --autosquash</td><td>Honor <code>fixup!</code> / <code>squash!</code> commits automatically</td></tr>
+    <tr><td>git rebase --autostash</td><td>Auto-stash dirty tree before rebasing</td></tr>
+    <tr><td>git rebase --rebase-merges</td><td>Preserve merge commits during rebase</td></tr>
+  </table>
+
+  <h3>Standard "update my feature branch" flow</h3>
+<pre><code><span class="c"># On your feature branch, get latest main</span>
+git fetch origin
+git rebase origin/main
+
+<span class="c"># If conflicts:</span>
+<span class="c">#   1. Edit conflicted files</span>
+<span class="c">#   2. git add &lt;resolved&gt;</span>
+<span class="c">#   3. git rebase --continue</span>
+
+<span class="c"># Force-push the rewritten branch (yours, not shared)</span>
+git push --force-with-lease</code></pre>
+
+  <h3>Interactive rebase — the history sculptor <span class="tag tip">Pro</span></h3>
+<pre><code><span class="c"># Edit the last 5 commits</span>
+git rebase -i HEAD~5
+
+<span class="c"># Edit everything since branching from main</span>
+git rebase -i main</code></pre>
+
+  <p>An editor opens with one line per commit. Change the leading word to apply an action:</p>
+
+  <table class="wide">
+    <tr><td>pick</td><td>Use commit as-is</td></tr>
+    <tr><td>reword (r)</td><td>Use commit, but edit the message</td></tr>
+    <tr><td>edit (e)</td><td>Stop here so you can amend the commit</td></tr>
+    <tr><td>squash (s)</td><td>Meld into previous commit, combine messages</td></tr>
+    <tr><td>fixup (f)</td><td>Like squash, but discard this commit's message</td></tr>
+    <tr><td>drop (d)</td><td>Delete the commit entirely</td></tr>
+    <tr><td>exec (x)</td><td>Run a shell command after the line (e.g. <code>x npm test</code>)</td></tr>
+    <tr><td>break (b)</td><td>Stop here, no command — manually inspect / change anything</td></tr>
+    <tr><td>label / reset / merge</td><td>Replicate merge structure — used with <code>--rebase-merges</code></td></tr>
+  </table>
+
+  <h3>The fixup workflow — clean history without the hassle</h3>
+<pre><code><span class="c"># 1. Discover a small mistake in commit abc1234</span>
+<span class="c">#    Stage your fix, then:</span>
+git commit --fixup abc1234
+
+<span class="c"># 2. Repeat for any other late fixes</span>
+
+<span class="c"># 3. Auto-squash all fixups into their targets</span>
+git rebase -i --autosquash main</code></pre>
+
+  <p>With <code>git config --global rebase.autoSquash true</code>, every interactive rebase automatically reorders <code>fixup!</code> commits next to their targets. Combined with <code>commit --fixup</code>, it's the cleanest possible workflow.</p>
+
+  <h3>Comparing pre/post rebase — range-diff</h3>
+<pre><code><span class="c"># Before forcing the push, see what really changed</span>
+git rebase main
+git range-diff main feature@{1} feature</code></pre>
+
+  <h3>Rebase vs. merge — the trade-off</h3>
+  <table class="wide">
+    <tr><th></th><th>Merge</th><th>Rebase</th></tr>
+    <tr><td>History</td><td>Branchy, true</td><td>Linear, simplified</td></tr>
+    <tr><td>Commits</td><td>Preserved as-is</td><td>Recreated with new SHAs</td></tr>
+    <tr><td>Public-safe</td><td>Always</td><td>Never on shared branches</td></tr>
+    <tr><td>Conflicts</td><td>Once, in merge commit</td><td>Possibly multiple times, per replayed commit</td></tr>
+    <tr><td>Best for</td><td>Long-lived branches, integration points</td><td>Short-lived feature branches, cleaning up local WIP</td></tr>
+  </table>
+
+  <div class="note git">
+    <span class="label">Hybrid strategy</span>
+    Rebase your feature branch onto <code>main</code> while developing (clean local history). Merge with <code>--no-ff</code> when integrating to <code>main</code> (preserves "this came from a feature" marker). GitHub's "Squash and merge" PR option achieves a similar outcome remotely.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-rebase" target="_blank" rel="noopener">git-rebase</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Branching-Rebasing" target="_blank" rel="noopener">Pro Git — rebasing</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-range-diff" target="_blank" rel="noopener">git-range-diff</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 14 TAGS ============ -->
+<section id="tags">
+  <div class="section-head">
+    <div class="section-num">14</div>
+    <h2>Tags &amp; releases<span class="sub">marking important moments in history</span></h2>
+  </div>
+
+  <p>Tags are immutable named pointers to a commit — perfect for marking releases. Two flavors: <strong>lightweight</strong> (a ref pointing at a commit, like a stationary branch) and <strong>annotated</strong> (a full Git object with a message, signature, and metadata).</p>
+
+  <h3>Tag commands</h3>
+  <table class="wide">
+    <tr><td>git tag</td><td>List all tags</td></tr>
+    <tr><td>git tag -l "v1.*"</td><td>List tags matching a pattern</td></tr>
+    <tr><td>git tag v1.0.0</td><td>Lightweight tag at HEAD</td></tr>
+    <tr><td>git tag -a v1.0.0 -m "Release 1.0"</td><td><strong>Annotated tag</strong> — preferred for releases</td></tr>
+    <tr><td>git tag -a v1.0.0 -m "msg" &lt;sha&gt;</td><td>Tag a past commit</td></tr>
+    <tr><td>git tag -s v1.0.0 -m "msg"</td><td>GPG-signed annotated tag</td></tr>
+    <tr><td>git tag -d v0.9.0</td><td>Delete a local tag</td></tr>
+    <tr><td>git push origin v1.0.0</td><td>Push one tag</td></tr>
+    <tr><td>git push origin --tags</td><td>Push all tags</td></tr>
+    <tr><td>git push --follow-tags</td><td>Push commits + reachable annotated tags</td></tr>
+    <tr><td>git push origin --delete v0.9.0</td><td>Delete a remote tag</td></tr>
+    <tr><td>git show v1.0.0</td><td>Show tag's commit + metadata</td></tr>
+    <tr><td>git tag -f v1.0.0 &lt;sha&gt;</td><td>Force-replace a tag (avoid on shared tags)</td></tr>
+  </table>
+
+  <h3>Annotated vs. lightweight</h3>
+  <table>
+    <tr><td>Lightweight</td><td>Just a ref to a commit. No metadata. Use for private/temporary markers.</td></tr>
+    <tr><td>Annotated</td><td>Full object with tagger, date, message, optional signature. Use for releases, ALWAYS.</td></tr>
+  </table>
+
+  <h3>Semantic Versioning quick reference</h3>
+<pre><code><span class="v">MAJOR</span>.<span class="v">MINOR</span>.<span class="v">PATCH</span>
+
+<span class="v">MAJOR</span>  &mdash; incompatible API changes
+<span class="v">MINOR</span>  &mdash; backwards-compatible new features
+<span class="v">PATCH</span>  &mdash; backwards-compatible bug fixes
+
+<span class="c"># Pre-release / build metadata</span>
+v1.2.0-alpha.1
+v1.2.0-beta.3
+v1.2.0-rc.1
+v1.2.0+20251231</code></pre>
+
+  <p>See the full <a class="ref" href="https://semver.org" target="_blank" rel="noopener">Semantic Versioning 2.0.0 spec</a> for canonical rules.</p>
+
+  <h3>Releases via GitHub CLI</h3>
+<pre><code><span class="c"># Create a release linked to a tag</span>
+gh release create v1.0.0 \
+  --title "v1.0.0 &mdash; Initial release" \
+  --notes "First public release"
+
+<span class="c"># Auto-generate notes from PRs since last tag</span>
+gh release create v1.1.0 --generate-notes
+
+<span class="c"># Mark as pre-release</span>
+gh release create v1.2.0-rc.1 --prerelease
+
+<span class="c"># Attach binaries</span>
+gh release create v1.0.0 ./dist/app-*.tar.gz
+
+<span class="c"># List, view, edit, delete</span>
+gh release list
+gh release view v1.0.0
+gh release edit v1.0.0 --notes "Updated notes"
+gh release delete v1.0.0</code></pre>
+
+  <h3>Useful describe</h3>
+<pre><code><span class="c"># "Most recent tag, plus how far we've come"</span>
+git describe
+<span class="c"># v1.2.0-15-g8f3c2a1</span>
+<span class="c"># &mdash;15 commits past v1.2.0, current SHA starts with 8f3c2a1</span>
+
+<span class="c"># Only annotated tags (default)</span>
+git describe
+
+<span class="c"># Include lightweight tags too</span>
+git describe --tags
+
+<span class="c"># Always print short SHA, even on a tag</span>
+git describe --always</code></pre>
+
+  <div class="note git">
+    <span class="label">Tags ≠ branches</span>
+    Don't push lightweight tags to share releases — they have no metadata, no signer, no message. Always use <code>-a</code> (annotated) or <code>-s</code> (signed annotated) for anything that leaves your machine.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-tag" target="_blank" rel="noopener">git-tag</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-describe" target="_blank" rel="noopener">git-describe</a></li>
+      <li><a class="ref" href="https://semver.org" target="_blank" rel="noopener">Semantic Versioning 2.0</a></li>
+      <li><a class="ref" href="https://cli.github.com/manual/gh_release" target="_blank" rel="noopener">gh release manual</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 15 REFLOG ============ -->
+<section id="reflog">
+  <div class="section-head">
+    <div class="section-num">15</div>
+    <h2>Reflog &amp; rescue<span class="sub">Git's local time machine</span></h2>
+  </div>
+
+  <p class="lede">The <strong>reflog</strong> records every move HEAD makes — every commit, switch, reset, rebase. It's how you recover from "I think I just deleted everything." Local-only, kept for ~90 days by default.</p>
+
+  <h3>Reading the reflog</h3>
+  <table class="wide">
+    <tr><td>git reflog</td><td>HEAD's reflog (newest first)</td></tr>
+    <tr><td>git reflog show &lt;branch&gt;</td><td>Reflog for a specific branch</td></tr>
+    <tr><td>git reflog show stash</td><td>Stash reflog</td></tr>
+    <tr><td>git reflog -n 20</td><td>Last 20 entries</td></tr>
+    <tr><td>git reflog --date=iso</td><td>With ISO timestamps</td></tr>
+    <tr><td>git reflog --since="1 hour ago"</td><td>Time-filtered</td></tr>
+  </table>
+
+<pre><code><span class="c"># Sample output</span>
+8f3c2a1 HEAD@{0}: rebase (finish): returning to refs/heads/feature
+8f3c2a1 HEAD@{1}: rebase (pick): apply migration
+6e9b1f0 HEAD@{2}: rebase (start): checkout main
+ab12cd3 HEAD@{3}: commit: WIP &mdash; broken state
+4f5d6c7 HEAD@{4}: commit: stable feature work</code></pre>
+
+  <h3>The rescue patterns</h3>
+
+  <h4>1. "I just did a hard reset and lost commits"</h4>
+<pre><code>git reflog
+<span class="c"># Find the SHA from BEFORE the reset</span>
+git reset --hard ab12cd3</code></pre>
+
+  <h4>2. "I deleted a branch with unmerged work"</h4>
+<pre><code><span class="c"># Reflog still has it (if &lt; 30 days for unreachable, ~90 for reachable)</span>
+git reflog                   <span class="c"># find the last SHA the branch pointed to</span>
+git switch -c recovered &lt;sha&gt;</code></pre>
+
+  <h4>3. "I rebased and the result is wrong"</h4>
+<pre><code>git reflog
+<span class="c"># Find HEAD@{N} where N is just before "rebase (start)"</span>
+git reset --hard HEAD@{4}</code></pre>
+
+  <h4>4. "I dropped a stash by accident"</h4>
+<pre><code><span class="c"># Stash drops aren't in HEAD's reflog &mdash; check stash's own reflog</span>
+git fsck --no-reflog | grep "dangling commit"
+<span class="c"># Or, if you have the SHA:</span>
+git stash apply &lt;sha&gt;</code></pre>
+
+  <h3>Time-relative refs — sometimes faster than reflog</h3>
+<pre><code>git switch main@{yesterday}
+git diff main@{1.week.ago}..main
+git log feature@{2.hours.ago}..feature
+
+<span class="c"># Index notation (Nth move ago)</span>
+git switch main@{3}    <span class="c"># 3 reflog entries back</span></code></pre>
+
+  <h3>Garbage collection &amp; reflog expiration</h3>
+  <p>Git eventually prunes unreachable objects to save space. Defaults:</p>
+  <ul class="plain">
+    <li>Reachable reflog entries expire after <strong>90 days</strong> (<code>gc.reflogExpire</code>)</li>
+    <li>Unreachable reflog entries expire after <strong>30 days</strong> (<code>gc.reflogExpireUnreachable</code>)</li>
+    <li><code>git gc --prune=now</code> immediately deletes anything older than the cutoff</li>
+  </ul>
+
+<pre><code><span class="c"># Expire reflog entries manually</span>
+git reflog expire --expire=30.days --all
+
+<span class="c"># Pause expiration on a critical branch</span>
+git config branch.&lt;name&gt;.reflogExpire never
+git config branch.&lt;name&gt;.reflogExpireUnreachable never</code></pre>
+
+  <div class="note danger">
+    <span class="label">--prune=now</span>
+    <code>git gc --prune=now --aggressive</code> deletes unreachable objects immediately. After running this, the reflog cannot save you. Avoid unless you really need the disk space.
+  </div>
+
+  <h3>fsck — find lost commits beyond reflog</h3>
+<pre><code><span class="c"># List dangling objects (commits, blobs, trees no ref points to)</span>
+git fsck --lost-found
+git fsck --no-reflog
+
+<span class="c"># Inspect a candidate</span>
+git show &lt;dangling-sha&gt;
+
+<span class="c"># Recover</span>
+git switch -c rescued &lt;dangling-sha&gt;</code></pre>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-reflog" target="_blank" rel="noopener">git-reflog</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-fsck" target="_blank" rel="noopener">git-fsck</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-gc" target="_blank" rel="noopener">git-gc</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 16 WORKTREES ============ -->
+<section id="worktrees">
+  <div class="section-head">
+    <div class="section-num">16</div>
+    <h2>Worktrees &amp; sparse-checkout<span class="sub">parallel checkouts and partial repos</span></h2>
+  </div>
+
+  <h3>Worktrees — multiple checked-out branches at once</h3>
+  <p>One repo, many working directories. Eliminates the "stash, switch, rebuild, switch back" dance for hotfixes. Each worktree has its own working tree and index but shares the object database.</p>
+
+  <table class="wide">
+    <tr><td>git worktree add ../hotfix hotfix/login-500</td><td>Add worktree at <code>../hotfix</code> on branch <code>hotfix/login-500</code></td></tr>
+    <tr><td>git worktree add -b new-branch ../path main</td><td>Create new branch in worktree</td></tr>
+    <tr><td>git worktree add --detach ../inspect &lt;sha&gt;</td><td>Detached worktree at a commit</td></tr>
+    <tr><td>git worktree list</td><td>List all worktrees</td></tr>
+    <tr><td>git worktree list -v</td><td>Verbose listing</td></tr>
+    <tr><td>git worktree list --porcelain</td><td>Machine-readable</td></tr>
+    <tr><td>git worktree remove &lt;path&gt;</td><td>Remove a worktree (requires clean)</td></tr>
+    <tr><td>git worktree remove --force &lt;path&gt;</td><td>Force-remove (loses uncommitted)</td></tr>
+    <tr><td>git worktree prune</td><td>Clean up administrative state for deleted worktrees</td></tr>
+    <tr><td>git worktree prune -n</td><td>Dry run</td></tr>
+    <tr><td>git worktree lock &lt;path&gt;</td><td>Mark a worktree as locked (prevents accidental prune — useful on removable drives)</td></tr>
+    <tr><td>git worktree unlock &lt;path&gt;</td><td>Reverse lock</td></tr>
+    <tr><td>git worktree move &lt;path&gt; &lt;new-path&gt;</td><td>Relocate a worktree</td></tr>
+  </table>
+
+  <h3>Hotfix-while-feature pattern</h3>
+<pre><code><span class="c"># You're in the middle of feature/auth, suddenly a P0 bug</span>
+cd ~/projects/myapp
+git worktree add ../myapp-hotfix -b hotfix/critical main
+
+<span class="c"># In a new terminal:</span>
+cd ../myapp-hotfix
+<span class="c"># &mdash;fix, commit, push, open PR&mdash;</span>
+gh pr create --base main --title "Fix critical login bug"
+
+<span class="c"># Back in original terminal, your feature work is untouched</span>
+cd ~/projects/myapp
+<span class="c"># &mdash;continue feature work&mdash;</span>
+
+<span class="c"># When hotfix is merged, clean up</span>
+git worktree remove ../myapp-hotfix
+git branch -d hotfix/critical</code></pre>
+
+  <h3>Sparse-checkout — partial working tree</h3>
+  <p>Useful in monorepos: only check out the directories you actually work in. Saves disk space and speeds up status / diff.</p>
+
+  <table class="wide">
+    <tr><td>git sparse-checkout init --cone</td><td>Initialize in cone mode (recommended; faster)</td></tr>
+    <tr><td>git sparse-checkout set apps/web libs/ui</td><td>Replace patterns — only these dirs in working tree</td></tr>
+    <tr><td>git sparse-checkout add libs/api</td><td>Add another path</td></tr>
+    <tr><td>git sparse-checkout list</td><td>Show current patterns</td></tr>
+    <tr><td>git sparse-checkout reapply</td><td>Re-apply (after a checkout that changed the patterns)</td></tr>
+    <tr><td>git sparse-checkout disable</td><td>Restore full working tree</td></tr>
+  </table>
+
+<pre><code><span class="c"># Practical example: monorepo with apps/, libs/, infra/</span>
+git clone --filter=blob:none --no-checkout git@github.com:org/monorepo.git
+cd monorepo
+git sparse-checkout init --cone
+git sparse-checkout set apps/web libs/shared
+git switch main
+<span class="c"># Only apps/web and libs/shared materialize on disk</span></code></pre>
+
+  <h3>Bundles — repos as files</h3>
+  <p>A bundle is a single file containing Git history — useful when you can't push/pull (air-gapped systems, sneakernet across networks).</p>
+
+  <table class="wide">
+    <tr><td>git bundle create &lt;file&gt; --all</td><td>Bundle the entire repo</td></tr>
+    <tr><td>git bundle create &lt;file&gt; main..feature</td><td>Bundle just a range</td></tr>
+    <tr><td>git bundle verify &lt;file&gt;</td><td>Check a bundle's integrity and prerequisites</td></tr>
+    <tr><td>git bundle list-heads &lt;file&gt;</td><td>Show what refs are in a bundle</td></tr>
+    <tr><td>git clone &lt;file&gt; new-repo</td><td>Clone from a bundle</td></tr>
+    <tr><td>git fetch &lt;file&gt; main</td><td>Fetch from a bundle into existing repo</td></tr>
+  </table>
+
+  <h3>Maintenance — keep big repos fast <span class="tag modern">Modern</span></h3>
+<pre><code><span class="c"># Register repo for background maintenance (gc, pack, prefetch)</span>
+git maintenance start
+
+<span class="c"># Run a maintenance task right now</span>
+git maintenance run --task=gc
+git maintenance run --task=prefetch
+
+<span class="c"># Stop scheduled tasks</span>
+git maintenance stop</code></pre>
+
+  <p><code>git maintenance</code> sets up cron / launchd / systemd timers to keep your repo healthy. Especially useful in monorepos where manual <code>git gc</code> would otherwise take ages.</p>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-worktree" target="_blank" rel="noopener">git-worktree</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-sparse-checkout" target="_blank" rel="noopener">git-sparse-checkout</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-bundle" target="_blank" rel="noopener">git-bundle</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-maintenance" target="_blank" rel="noopener">git-maintenance</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 17 PLUMBING ============ -->
+<section id="plumbing">
+  <div class="section-head">
+    <div class="section-num">17</div>
+    <h2>Plumbing &amp; objects<span class="sub">Git as a content-addressable filesystem</span></h2>
+  </div>
+
+  <p class="lede">Underneath the porcelain (the user-facing commands) sits the plumbing: low-level commands that operate directly on Git's object database. You almost never need them — but understanding them is the difference between using Git and <em>knowing</em> Git.</p>
+
+  <h3>Inspecting the object database</h3>
+  <table class="wide">
+    <tr><td>git cat-file -t &lt;sha&gt;</td><td>Object type: blob, tree, commit, tag</td></tr>
+    <tr><td>git cat-file -s &lt;sha&gt;</td><td>Object size in bytes</td></tr>
+    <tr><td>git cat-file -p &lt;sha&gt;</td><td>Pretty-print object contents</td></tr>
+    <tr><td>git cat-file --batch-check --batch-all-objects</td><td>Stream metadata for every object</td></tr>
+    <tr><td>git rev-parse HEAD</td><td>Resolve a refspec to its full SHA</td></tr>
+    <tr><td>git rev-parse --short HEAD</td><td>Short SHA</td></tr>
+    <tr><td>git rev-parse main^{tree}</td><td>Tree of <code>main</code>'s commit</td></tr>
+    <tr><td>git ls-tree HEAD</td><td>List entries in HEAD's tree</td></tr>
+    <tr><td>git ls-tree -r HEAD</td><td>Recursive — like <code>find</code></td></tr>
+    <tr><td>git ls-files</td><td>Files tracked in the index</td></tr>
+    <tr><td>git ls-files --others --exclude-standard</td><td>Untracked, non-ignored files</td></tr>
+    <tr><td>git verify-pack -v &lt;.idx&gt;</td><td>Inspect a packfile</td></tr>
+  </table>
+
+  <h3>Creating objects manually — what <code>git add</code> + <code>git commit</code> really do</h3>
+<pre><code><span class="c"># 1. Hash a file's contents into a blob</span>
+echo "hello world" | git hash-object --stdin -w
+<span class="c"># &rarr; 3b18e512dba79e4c8300dd08aeb37f8e728b8dad</span>
+
+<span class="c"># 2. Read it back</span>
+git cat-file -p 3b18e512dba79e4c8300dd08aeb37f8e728b8dad
+
+<span class="c"># 3. Build a tree containing that blob</span>
+git update-index --add --cacheinfo 100644 \
+  3b18e512dba79e4c8300dd08aeb37f8e728b8dad hello.txt
+git write-tree
+<span class="c"># &rarr; 68aba62e560c0ebc3396e8ae9335232cd93a3f60</span>
+
+<span class="c"># 4. Create a commit pointing to that tree</span>
+echo "first commit" | git commit-tree 68aba62e -p HEAD
+<span class="c"># &rarr; new commit SHA</span>
+
+<span class="c"># 5. Move the branch ref</span>
+git update-ref refs/heads/main &lt;new-commit-sha&gt;</code></pre>
+
+  <p>That sequence — <code>hash-object</code>, <code>update-index</code>, <code>write-tree</code>, <code>commit-tree</code>, <code>update-ref</code> — is exactly what <code>git add</code> + <code>git commit</code> automate.</p>
+
+  <h3>Refs and symbolic refs</h3>
+  <table class="wide">
+    <tr><td>git update-ref refs/heads/foo &lt;sha&gt;</td><td>Move a ref to point at <code>sha</code></td></tr>
+    <tr><td>git update-ref -d refs/heads/foo</td><td>Delete a ref</td></tr>
+    <tr><td>git symbolic-ref HEAD</td><td>What does HEAD point at?</td></tr>
+    <tr><td>git symbolic-ref HEAD refs/heads/main</td><td>Point HEAD at a branch</td></tr>
+    <tr><td>git for-each-ref</td><td>Iterate every ref</td></tr>
+    <tr><td>git for-each-ref --format='%(refname:short) %(committerdate:short)' refs/heads/</td><td>Custom-format branch listing</td></tr>
+  </table>
+
+  <h3>The hashing function</h3>
+  <p>Object SHAs are deterministic: the same content always produces the same SHA. The hash is computed over <code>"&lt;type&gt; &lt;size&gt;\0&lt;content&gt;"</code> — that's why an empty file isn't all zeros.</p>
+
+  <p>Modern Git supports SHA-256 in addition to SHA-1. Set on init:</p>
+
+<pre><code>git init --object-format=sha256</code></pre>
+
+  <p>Most servers (including GitHub at the time of writing) still use SHA-1; SHA-256 is opt-in until ecosystem support is universal.</p>
+
+  <h3>Trailers — structured commit metadata</h3>
+<pre><code><span class="c"># Add a Co-authored-by trailer (GitHub honors these for credit)</span>
+git commit -m "feat: pair-programmed feature" \
+  --trailer "Co-authored-by: Alex Smith &lt;alex@example.com&gt;"
+
+<span class="c"># Read trailers from existing commits</span>
+git log --format='%(trailers)' -n 5
+
+<span class="c"># Interpret programmatically</span>
+git interpret-trailers --parse &lt; commit-msg.txt</code></pre>
+
+  <div class="note git">
+    <span class="label">Why care about plumbing?</span>
+    Plumbing commands shine in scripts, hooks, and CI pipelines: deterministic, machine-readable output and exact behavior. They're also how you debug "Git did something weird" — drop one level deeper and you can see exactly what happened.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain" target="_blank" rel="noopener">Pro Git — plumbing &amp; porcelain</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-cat-file" target="_blank" rel="noopener">git-cat-file</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-hash-object" target="_blank" rel="noopener">git-hash-object</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-update-ref" target="_blank" rel="noopener">git-update-ref</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-for-each-ref" target="_blank" rel="noopener">git-for-each-ref</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 18 CONFIG & ALIASES ============ -->
+<section id="config">
+  <div class="section-head">
+    <div class="section-num">18</div>
+    <h2>Config &amp; aliases<span class="sub">make Git fit your fingers</span></h2>
+  </div>
+
+  <h3>Config scopes — first match wins</h3>
+  <table>
+    <tr><td>--system</td><td><code>/etc/gitconfig</code> — every user on this machine</td></tr>
+    <tr><td>--global</td><td><code>~/.gitconfig</code> — current user, all repos</td></tr>
+    <tr><td>--local (default)</td><td><code>.git/config</code> — this repo only</td></tr>
+    <tr><td>--worktree</td><td><code>.git/config.worktree</code> — this worktree only</td></tr>
+  </table>
+
+  <h3>Config commands</h3>
+  <table class="wide">
+    <tr><td>git config --list</td><td>All settings (merged across scopes)</td></tr>
+    <tr><td>git config --list --show-origin</td><td>Show which file each setting comes from</td></tr>
+    <tr><td>git config &lt;key&gt;</td><td>Read one setting</td></tr>
+    <tr><td>git config &lt;key&gt; &lt;value&gt;</td><td>Set one setting</td></tr>
+    <tr><td>git config --add &lt;key&gt; &lt;value&gt;</td><td>Add a value (multi-valued keys)</td></tr>
+    <tr><td>git config --unset &lt;key&gt;</td><td>Remove a setting</td></tr>
+    <tr><td>git config --edit</td><td>Open the config file in <code>$EDITOR</code></td></tr>
+    <tr><td>git config --get-regexp &lt;pattern&gt;</td><td>Find keys matching a regex</td></tr>
+  </table>
+
+  <h3>Conditional includes — different identity per directory</h3>
+<pre><code><span class="c"># ~/.gitconfig</span>
+[user]
+    name = Dimitris
+    email = dimitris@personal.com
+
+[includeIf "gitdir:~/work/"]
+    path = ~/.gitconfig-work
+
+<span class="c"># ~/.gitconfig-work</span>
+[user]
+    email = dimitris@company.com
+[commit]
+    gpgsign = true</code></pre>
+
+  <p>Now any repo under <code>~/work/</code> uses your work email automatically. <code>gitdir/i:</code> is the case-insensitive variant; <code>onbranch:</code> matches by branch name.</p>
+
+  <h3>Aliases — the heart of a productive setup</h3>
+<pre><code><span class="c"># Set via command line</span>
+git config --global alias.s "status -sb"
+git config --global alias.co "switch"
+git config --global alias.cb "switch -c"
+git config --global alias.unstage "restore --staged"
+
+<span class="c"># Pretty graph log &mdash; the legend</span>
+git config --global alias.lg \
+  "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset' --abbrev-commit"
+
+<span class="c"># Last commit, full diff</span>
+git config --global alias.last "log -1 HEAD --stat"
+
+<span class="c"># What did I do today?</span>
+git config --global alias.today \
+  "log --since='6 am' --author='Dimitris' --pretty=format:'%h %s'"
+
+<span class="c"># Branches sorted by recent activity</span>
+git config --global alias.recent \
+  "for-each-ref --sort=-committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
+
+<span class="c"># Quick amend with no message edit</span>
+git config --global alias.fixlast "commit --amend --no-edit"
+
+<span class="c"># Show who's been touching a file (with renames)</span>
+git config --global alias.who "shortlog -sn --no-merges --follow --"</code></pre>
+
+  <h3>Direct .gitconfig editing — easier for many aliases</h3>
+<pre><code><span class="c"># ~/.gitconfig</span>
+[alias]
+    s = status -sb
+    co = switch
+    cb = switch -c
+    unstage = restore --staged
+    last = log -1 HEAD --stat
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset' --abbrev-commit
+
+    <span class="c"># Shell-out aliases prefix with "!"</span>
+    pushf = "!git push --force-with-lease"
+    nuke = "!git reset --hard origin/$(git symbolic-ref --short HEAD)"</code></pre>
+
+  <h3>Recommended global config — battle-tested defaults</h3>
+<pre><code>[user]
+    name = Your Name
+    email = you@example.com
+
+[init]
+    defaultBranch = main
+
+[pull]
+    ff = only
+
+[fetch]
+    prune = true
+    pruneTags = true
+
+[merge]
+    conflictStyle = zdiff3
+
+[rebase]
+    autoSquash = true
+    autoStash = true
+
+[rerere]
+    enabled = true
+
+[diff]
+    algorithm = histogram
+    colorMoved = default
+    mnemonicPrefix = true
+
+[push]
+    autoSetupRemote = true
+    followTags = true
+
+[commit]
+    verbose = true</code></pre>
+
+  <p><code>commit.verbose = true</code> shows the diff in your editor when writing a commit message — invaluable for catching last-minute mistakes.</p>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/docs/git-config" target="_blank" rel="noopener">git-config (full reference)</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs/git-config#_conditional_includes" target="_blank" rel="noopener">Conditional includes</a></li>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2/Git-Tools-Aliases" target="_blank" rel="noopener">Pro Git — aliases</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 19 GITHUB CLI ============ -->
+<section id="github">
+  <div class="section-head">
+    <div class="section-num">19</div>
+    <h2>GitHub via CLI<span class="sub">collaboration without leaving the terminal</span></h2>
+  </div>
+
+  <p class="lede">The GitHub CLI (<code>gh</code>) is the official terminal interface to GitHub. Pull requests, issues, releases, code review, repo creation — all of it without context-switching to a browser.</p>
+
+  <h3>Auth &amp; account</h3>
+  <table class="wide">
+    <tr><td>gh auth login</td><td>Interactive sign-in (browser flow)</td></tr>
+    <tr><td>gh auth login --hostname &lt;ghe.host&gt;</td><td>Sign in to GitHub Enterprise</td></tr>
+    <tr><td>gh auth login --with-token &lt; token.txt</td><td>Pipe a PAT for non-interactive auth</td></tr>
+    <tr><td>gh auth status</td><td>Verify which accounts you're signed into</td></tr>
+    <tr><td>gh auth refresh --scopes write:packages,read:packages</td><td>Add scopes to existing token</td></tr>
+    <tr><td>gh auth token</td><td>Print the current token (use carefully)</td></tr>
+    <tr><td>gh auth switch</td><td>Switch between configured accounts</td></tr>
+    <tr><td>gh auth logout</td><td>Sign out</td></tr>
+  </table>
+
+  <h3>Repos — create, clone, fork</h3>
+  <table class="wide">
+    <tr><td>gh repo create</td><td>Interactive new-repo wizard</td></tr>
+    <tr><td>gh repo create my-app --public --source=. --push</td><td>Create from existing local repo and push</td></tr>
+    <tr><td>gh repo clone owner/repo</td><td>Clone (handles SSH/HTTPS automatically)</td></tr>
+    <tr><td>gh repo clone owner/repo -- --depth=1</td><td>Pass flags through to <code>git clone</code></td></tr>
+    <tr><td>gh repo fork owner/repo</td><td>Fork to your account</td></tr>
+    <tr><td>gh repo fork owner/repo --clone --remote</td><td>Fork + clone + add upstream remote</td></tr>
+    <tr><td>gh repo view</td><td>Open current repo in browser</td></tr>
+    <tr><td>gh repo view --web</td><td>Same — explicit</td></tr>
+    <tr><td>gh repo list owner</td><td>List repos under a user/org</td></tr>
+    <tr><td>gh repo edit --default-branch main</td><td>Change default branch</td></tr>
+    <tr><td>gh repo edit --visibility private</td><td>Toggle public/private</td></tr>
+    <tr><td>gh repo delete owner/repo --yes</td><td>Delete a repo (irreversible)</td></tr>
+    <tr><td>gh repo archive owner/repo</td><td>Archive (read-only)</td></tr>
+  </table>
+
+  <h3>Pull requests — the bread and butter</h3>
+  <table class="wide">
+    <tr><td>gh pr create</td><td>Interactive PR creation from current branch</td></tr>
+    <tr><td>gh pr create --fill</td><td>Auto-fill title/body from commits</td></tr>
+    <tr><td>gh pr create --base main --title "..." --body "..."</td><td>Non-interactive</td></tr>
+    <tr><td>gh pr create --draft</td><td>Open as draft</td></tr>
+    <tr><td>gh pr create --reviewer user1,user2 --label bug</td><td>Pre-fill reviewers + labels</td></tr>
+    <tr><td>gh pr list</td><td>List open PRs</td></tr>
+    <tr><td>gh pr list --author "@me"</td><td>Mine</td></tr>
+    <tr><td>gh pr list --state all --limit 50</td><td>Including closed/merged</td></tr>
+    <tr><td>gh pr view 123</td><td>Show PR details in terminal</td></tr>
+    <tr><td>gh pr view 123 --web</td><td>Open in browser</td></tr>
+    <tr><td>gh pr checkout 123</td><td>Check out a PR's branch locally</td></tr>
+    <tr><td>gh pr checkout https://github.com/.../pull/123</td><td>By URL</td></tr>
+    <tr><td>gh pr diff 123</td><td>Show PR diff inline</td></tr>
+    <tr><td>gh pr status</td><td>Status of PRs relevant to you</td></tr>
+    <tr><td>gh pr checks 123</td><td>CI / status check results</td></tr>
+    <tr><td>gh pr checks 123 --watch</td><td>Live-update until checks complete</td></tr>
+    <tr><td>gh pr review 123 --approve</td><td>Approve</td></tr>
+    <tr><td>gh pr review 123 --request-changes --body "fix tests"</td><td>Request changes</td></tr>
+    <tr><td>gh pr review 123 --comment --body "looks good"</td><td>Plain comment review</td></tr>
+    <tr><td>gh pr ready 123</td><td>Mark draft as ready for review</td></tr>
+    <tr><td>gh pr edit 123 --add-label urgent --title "new"</td><td>Edit metadata</td></tr>
+    <tr><td>gh pr merge 123 --merge</td><td>Merge commit</td></tr>
+    <tr><td>gh pr merge 123 --squash --delete-branch</td><td>Squash + cleanup branch</td></tr>
+    <tr><td>gh pr merge 123 --rebase --auto</td><td>Auto-merge once checks pass</td></tr>
+    <tr><td>gh pr close 123</td><td>Close without merging</td></tr>
+    <tr><td>gh pr reopen 123</td><td>Reopen</td></tr>
+  </table>
+
+  <h3>Typical PR workflow</h3>
+<pre><code><span class="c"># 1. Branch and work</span>
+git switch -c feature/api-rate-limit
+<span class="c"># &mdash;edit, commit&mdash;</span>
+git push -u origin feature/api-rate-limit
+
+<span class="c"># 2. Open PR</span>
+gh pr create --base main --fill --reviewer alice,bob
+
+<span class="c"># 3. Watch CI</span>
+gh pr checks --watch
+
+<span class="c"># 4. Address review feedback</span>
+<span class="c"># &mdash;edit, commit, push&mdash;</span>
+gh pr comment --body "Updated based on feedback, please re-review"
+
+<span class="c"># 5. Auto-merge once approved + CI green</span>
+gh pr merge --squash --auto --delete-branch</code></pre>
+
+  <h3>Issues</h3>
+  <table class="wide">
+    <tr><td>gh issue create --title "..." --body "..."</td><td>Create issue</td></tr>
+    <tr><td>gh issue create --template bug_report.md</td><td>Use a template</td></tr>
+    <tr><td>gh issue list</td><td>List open issues</td></tr>
+    <tr><td>gh issue list --label "bug" --assignee "@me"</td><td>Filtered</td></tr>
+    <tr><td>gh issue view 42</td><td>Show issue</td></tr>
+    <tr><td>gh issue comment 42 --body "On it"</td><td>Add comment</td></tr>
+    <tr><td>gh issue close 42</td><td>Close</td></tr>
+    <tr><td>gh issue reopen 42</td><td>Reopen</td></tr>
+    <tr><td>gh issue edit 42 --add-label urgent</td><td>Edit</td></tr>
+    <tr><td>gh issue develop 42 -c</td><td>Create &amp; checkout a branch linked to issue #42</td></tr>
+  </table>
+
+  <h3>Branch protection — set rules from CLI</h3>
+<pre><code><span class="c"># Require PR reviews + passing checks via gh api</span>
+gh api -X PUT repos/:owner/:repo/branches/main/protection \
+  -f required_status_checks='{"strict":true,"contexts":["ci"]}' \
+  -f enforce_admins=true \
+  -f required_pull_request_reviews='{"required_approving_review_count":1}' \
+  -f restrictions=null</code></pre>
+
+  <h3>Other useful gh commands</h3>
+  <table class="wide">
+    <tr><td>gh run list</td><td>Recent workflow (Actions) runs</td></tr>
+    <tr><td>gh run view &lt;id&gt; --log</td><td>Logs for a run</td></tr>
+    <tr><td>gh run watch</td><td>Live-watch the most recent run</td></tr>
+    <tr><td>gh run rerun &lt;id&gt;</td><td>Rerun a failed workflow</td></tr>
+    <tr><td>gh workflow list</td><td>List workflow files</td></tr>
+    <tr><td>gh workflow run &lt;name&gt;</td><td>Manually dispatch a workflow</td></tr>
+    <tr><td>gh release view --web</td><td>Open releases page</td></tr>
+    <tr><td>gh gist create file.md --public</td><td>Quick gist</td></tr>
+    <tr><td>gh codespace list</td><td>Manage Codespaces</td></tr>
+    <tr><td>gh secret set NAME --body "value"</td><td>Set repo secret</td></tr>
+    <tr><td>gh api &lt;endpoint&gt;</td><td>Direct REST/GraphQL API access</td></tr>
+    <tr><td>gh extension install &lt;owner/name&gt;</td><td>Install a gh extension</td></tr>
+  </table>
+
+  <h3>Markdown &amp; READMEs — the project face</h3>
+  <p>Every repo's README is rendered Markdown. It's the project's homepage on GitHub. Conventions worth following:</p>
+
+  <ul class="plain">
+    <li>Project title (H1) + one-sentence description</li>
+    <li>Status badges (CI, version, license)</li>
+    <li>Quickstart — fewest steps to running</li>
+    <li>Installation, configuration, usage examples</li>
+    <li>Contributing guidelines (or link to <code>CONTRIBUTING.md</code>)</li>
+    <li>License section pointing to <code>LICENSE</code> file</li>
+  </ul>
+
+  <p>For collaborative projects, also commit:</p>
+  <ul class="plain">
+    <li><code>.github/CODEOWNERS</code> — auto-assign reviewers</li>
+    <li><code>.github/PULL_REQUEST_TEMPLATE.md</code> — PR description scaffold</li>
+    <li><code>.github/ISSUE_TEMPLATE/*.yml</code> — structured issue forms</li>
+    <li><code>SECURITY.md</code> — vulnerability reporting</li>
+    <li><code>CONTRIBUTING.md</code> — how to contribute</li>
+  </ul>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://cli.github.com/manual/" target="_blank" rel="noopener">GitHub CLI manual</a></li>
+      <li><a class="ref" href="https://docs.github.com/en/pull-requests" target="_blank" rel="noopener">GitHub docs — Pull Requests</a></li>
+      <li><a class="ref" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches" target="_blank" rel="noopener">Branch protection</a></li>
+      <li><a class="ref" href="https://docs.github.com/en/communities" target="_blank" rel="noopener">Community health files</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 20 WORKFLOWS ============ -->
+<section id="workflows">
+  <div class="section-head">
+    <div class="section-num">20</div>
+    <h2>Workflows that pay rent<span class="sub">battle-tested patterns, not theoretical ones</span></h2>
+  </div>
+
+  <p>Starting points, not scripture. Mix and match for your team's risk tolerance, deployment cadence, and code-review culture.</p>
+
+  <h3>1. The classic feature branch</h3>
+<pre><code><span class="c"># Update main</span>
+git switch main
+git pull
+
+<span class="c"># Branch off</span>
+git switch -c feature/oauth-login
+
+<span class="c"># Work in atomic commits</span>
+<span class="c"># &mdash;edit, git add -p, git commit&mdash;</span>
+
+<span class="c"># Push and open PR</span>
+git push -u origin feature/oauth-login
+gh pr create --fill
+
+<span class="c"># Once approved + CI passes</span>
+gh pr merge --squash --delete-branch
+git switch main
+git pull --prune</code></pre>
+
+  <h3>2. Fork &amp; pull request (open-source contribution)</h3>
+<pre><code><span class="c"># 1. Fork on GitHub, then clone YOUR fork</span>
+gh repo fork upstream-owner/project --clone --remote
+cd project
+
+<span class="c"># Now: origin = your fork, upstream = original repo</span>
+git remote -v
+
+<span class="c"># 2. Always branch from a fresh upstream main</span>
+git fetch upstream
+git switch -c fix/typo-readme upstream/main
+
+<span class="c"># 3. Work, commit, push to YOUR fork</span>
+git push -u origin fix/typo-readme
+
+<span class="c"># 4. Open PR against upstream</span>
+gh pr create --repo upstream-owner/project --base main
+
+<span class="c"># 5. Keep your fork in sync</span>
+git switch main
+git fetch upstream
+git merge upstream/main
+git push origin main</code></pre>
+
+  <h3>3. Trunk-based development</h3>
+  <p>Short-lived branches (hours, not days), all merging to <code>main</code>. Feature flags gate incomplete work in production. Best for high-cadence, well-tested teams.</p>
+
+<pre><code>git switch main &amp;&amp; git pull
+git switch -c task/short-lived
+<span class="c"># &mdash;commit, push, PR, merge within the day&mdash;</span>
+
+<span class="c"># In code, gate the new behavior</span>
+if (featureFlags.isEnabled('new-checkout')) { ... }</code></pre>
+
+  <h3>4. GitFlow — long-lived branches</h3>
+  <p>For projects with formal release cycles. Branches:</p>
+  <ul class="plain">
+    <li><code>main</code> — production</li>
+    <li><code>develop</code> — integration branch for next release</li>
+    <li><code>feature/*</code> — branch from <code>develop</code>, merge back</li>
+    <li><code>release/*</code> — stabilize a release, merge into both <code>main</code> and <code>develop</code></li>
+    <li><code>hotfix/*</code> — branch from <code>main</code>, merge into both</li>
+  </ul>
+  <p>More overhead than trunk-based. Use only if you have multiple production versions in the wild simultaneously.</p>
+
+  <h3>5. The atomic-commit + fixup workflow</h3>
+<pre><code><span class="c"># Set once</span>
+git config --global rebase.autoSquash true
+git config --global rebase.autoStash true
+
+<span class="c"># Day's work &mdash; clean commits as you go</span>
+git add -p &amp;&amp; git commit -m "feat(api): add /users endpoint"
+git add -p &amp;&amp; git commit -m "test(api): cover /users edge cases"
+
+<span class="c"># Notice a typo in the first commit?</span>
+git add . &amp;&amp; git commit --fixup HEAD~1
+
+<span class="c"># Before pushing, auto-squash all fixups in place</span>
+git rebase -i --autosquash main
+
+<span class="c"># Final, clean push</span>
+git push -u origin feature/users-api</code></pre>
+
+  <h3>6. Hotfix while mid-feature</h3>
+<pre><code><span class="c"># You're deep in feature/auth, P0 bug reported on main</span>
+git stash push -m "wip: auth refactor"
+git switch main &amp;&amp; git pull
+git switch -c hotfix/login-500
+<span class="c"># &mdash;fix, test, commit, push, PR, merge&mdash;</span>
+gh pr create --fill --label hotfix
+gh pr merge --squash --delete-branch
+
+<span class="c"># Back to feature work</span>
+git switch -
+git stash pop</code></pre>
+
+  <p>Or, with worktrees (no stashing needed):</p>
+
+<pre><code>git worktree add ../app-hotfix -b hotfix/login-500 main
+cd ../app-hotfix
+<span class="c"># &mdash;fix in parallel terminal&mdash;</span>
+gh pr create --fill --label hotfix
+cd - &amp;&amp; git worktree remove ../app-hotfix</code></pre>
+
+  <h3>7. CI automation snippets</h3>
+<pre><code><span class="c"># GitHub Actions &mdash; auto-merge on label</span>
+<span class="c"># .github/workflows/automerge.yml</span>
+name: Auto-merge
+on:
+  pull_request:
+    types: [labeled]
+jobs:
+  merge:
+    if: github.event.label.name == 'auto-merge'
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh pr merge --squash --auto --delete-branch ${{ github.event.pull_request.number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}</code></pre>
+
+  <h3>8. Release tagging — manual</h3>
+<pre><code><span class="c"># From clean main</span>
+git switch main &amp;&amp; git pull
+
+<span class="c"># Annotated, signed tag</span>
+git tag -s v1.4.0 -m "Release 1.4.0 &mdash; payments + i18n"
+
+<span class="c"># Push tag (and trigger your release workflow)</span>
+git push origin v1.4.0
+
+<span class="c"># Create the GitHub release with auto-generated notes</span>
+gh release create v1.4.0 --generate-notes --verify-tag</code></pre>
+
+  <h3>9. Bisect-driven debugging</h3>
+<pre><code><span class="c"># Save a one-line repro test</span>
+cat &gt; /tmp/test.sh &lt;&lt;'EOF'
+#!/bin/sh
+npm install --silent &amp;&amp; npm test -- --silent regression/login
+EOF
+chmod +x /tmp/test.sh
+
+git bisect start
+git bisect bad HEAD
+git bisect good v1.3.0
+git bisect run /tmp/test.sh
+git bisect reset</code></pre>
+
+  <p>Git auto-finds the breaking commit out of potentially hundreds in 10–20 steps. Worth investing 5 minutes in a clean repro script.</p>
+
+  <h3>10. Branch cleanup</h3>
+<pre><code><span class="c"># See branches already merged into main</span>
+git branch --merged main
+
+<span class="c"># Delete all of them in one go (skip main itself)</span>
+git branch --merged main | grep -v "^\*\|main\|develop" | xargs -r git branch -d
+
+<span class="c"># Prune stale remote-tracking refs</span>
+git fetch --prune --prune-tags
+
+<span class="c"># Find branches with no upstream (fork-style stale)</span>
+git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads/ \
+  | awk '$2 == ""'</code></pre>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://docs.github.com/en/get-started/using-github/github-flow" target="_blank" rel="noopener">GitHub flow</a></li>
+      <li><a class="ref" href="https://trunkbaseddevelopment.com" target="_blank" rel="noopener">Trunk-based development</a></li>
+      <li><a class="ref" href="https://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="noopener">GitFlow original post</a></li>
+      <li><a class="ref" href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions docs</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 21 PRO TIPS ============ -->
+<section id="protips">
+  <div class="section-head">
+    <div class="section-num">21</div>
+    <h2>Pro-tips &amp; gotchas<span class="sub">the things nobody tells you until you hit them</span></h2>
+  </div>
+
+  <h3>Best practices</h3>
+  <ul class="plain">
+    <li><strong>Commit early, commit often.</strong> Rewrite later with rebase. Frequent commits make recovery and bisecting trivial.</li>
+    <li><strong>One commit = one logical change.</strong> If your message has "and" in it, it should probably be two commits.</li>
+    <li><strong>Imperative mood in commit messages.</strong> "Add login button", not "Added" / "Adds". Subject &lt; 50 chars; wrap body at 72.</li>
+    <li><strong>Pull with <code>--ff-only</code> by default.</strong> Forces an explicit decision (merge vs. rebase) when histories diverge.</li>
+    <li><strong>Always <code>--force-with-lease</code>, never plain <code>--force</code>.</strong> Protects against silently overwriting a teammate's push.</li>
+    <li><strong>Annotated tags only for releases.</strong> Lightweight tags lose context; annotated tags carry message + signer + date.</li>
+    <li><strong>Set up <code>rerere</code>.</strong> Once you've resolved a conflict once, Git remembers it. Saves hours during long-lived rebases.</li>
+    <li><strong>Use <code>zdiff3</code> conflict style.</strong> Shows the original alongside both sides — radically easier to resolve.</li>
+    <li><strong>Use <code>commit.verbose=true</code>.</strong> Shows the diff inline when writing your commit message — catches mistakes before they ship.</li>
+    <li><strong>Pre-commit hooks save reviews.</strong> Lint + format + run unit tests before commit. Use <a class="ref" href="https://pre-commit.com" target="_blank" rel="noopener">pre-commit</a> or <a class="ref" href="https://typicode.github.io/husky/" target="_blank" rel="noopener">husky</a>.</li>
+    <li><strong>One <code>.gitignore</code> per repo, not per directory.</strong> Easier to audit and maintain.</li>
+    <li><strong>Never commit secrets.</strong> If you do, rotate immediately — rewriting history won't help if it was pushed.</li>
+    <li><strong>Sign your commits</strong> (<code>commit.gpgsign=true</code>) for repos that care about authorship integrity.</li>
+    <li><strong>Use <code>.git-blame-ignore-revs</code></strong> for noisy reformatting commits, so blame stays useful.</li>
+    <li><strong>Tag releases, branch features, fork forks.</strong> Don't tag for trivia; don't branch for tasks that take 10 minutes; don't fork what you can clone.</li>
+  </ul>
+
+  <h3>Common gotchas</h3>
+  <ul class="plain">
+    <li><strong><code>git checkout</code> is overloaded.</strong> Modern Git replaces it with <code>git switch</code> (branches) and <code>git restore</code> (files). Use them — fewer ways to misfire.</li>
+    <li><strong>Detached HEAD ≠ broken.</strong> It's just HEAD pointing at a commit instead of a branch. Make new commits there at your own peril — they have no branch and will be GC'd unless you save them with <code>git switch -c</code>.</li>
+    <li><strong>Already-tracked files are NOT retroactively ignored.</strong> Adding to <code>.gitignore</code> after committing does nothing. Use <code>git rm --cached</code> to stop tracking.</li>
+    <li><strong><code>git pull</code> = <code>fetch</code> + <code>merge</code>.</strong> If <code>main</code> has diverged and pull.ff is unset, you'll get a surprise merge commit. Set <code>pull.ff=only</code>.</li>
+    <li><strong>Rebasing rewrites SHAs.</strong> Force-pushing a rebased branch breaks anyone who pulled the old version. Coordinate or use <code>--force-with-lease</code>.</li>
+    <li><strong>Stashing untracked files needs <code>-u</code>.</strong> By default, <code>git stash</code> ignores untracked files. They stay in your working tree if you switch branches.</li>
+    <li><strong><code>git stash pop</code> can leave the stash dropped on conflict.</strong> Use <code>git stash apply</code> when uncertain.</li>
+    <li><strong><code>git reset --hard</code> destroys uncommitted changes silently.</strong> Reflog won't save them — they were never committed. Stash first.</li>
+    <li><strong>Reflog is local.</strong> A fresh <code>git clone</code> has no reflog history. Don't rely on it after cloning.</li>
+    <li><strong>Tags don't push automatically.</strong> Use <code>git push --tags</code> or <code>git push --follow-tags</code>, or set <code>push.followTags=true</code>.</li>
+    <li><strong>Submodules are a footgun.</strong> Prefer monorepos, package managers, or git subtree where possible. If you must, always use <code>git clone --recurse-submodules</code>.</li>
+    <li><strong><code>git revert</code> on a merge commit needs <code>-m</code>.</strong> You must specify which parent's history to keep (usually <code>-m 1</code>).</li>
+    <li><strong>Line endings.</strong> Mixed CRLF/LF causes phantom diffs across Windows/macOS/Linux. Set <code>core.autocrlf=input</code> on Mac/Linux, <code>true</code> on Windows. Or commit a <code>.gitattributes</code> with <code>* text=auto eol=lf</code>.</li>
+    <li><strong>Filename case insensitivity (macOS/Windows).</strong> <code>FOO.md</code> and <code>foo.md</code> are the same file on case-insensitive filesystems but different in Git's index. Set <code>core.ignoreCase=false</code> with caution.</li>
+    <li><strong>Large files.</strong> Git stores entire copies of every version of every file. For binaries, use <a class="ref" href="https://git-lfs.com/" target="_blank" rel="noopener">Git LFS</a> or external storage.</li>
+    <li><strong>Time zones in <code>git log</code>.</strong> By default, dates show in author's TZ. Use <code>--date=local</code> or <code>--date=iso-strict</code> for consistency.</li>
+    <li><strong>Squash merges break branch parentage.</strong> The squashed commit is unrelated to the original feature branch's commits — Git can't tell they were "the same work" later.</li>
+  </ul>
+
+  <h3>Recovery cheat-sheet</h3>
+  <table class="wide">
+    <tr><th>Symptom</th><th>First-line response</th></tr>
+    <tr><td>"I lost my last commit"</td><td><code>git reflog</code>, then <code>git reset --hard &lt;sha&gt;</code></td></tr>
+    <tr><td>"I deleted a branch"</td><td><code>git reflog</code>, then <code>git switch -c &lt;name&gt; &lt;sha&gt;</code></td></tr>
+    <tr><td>"I committed to the wrong branch"</td><td><code>git reset HEAD~ --soft</code>, switch, recommit</td></tr>
+    <tr><td>"I committed something I shouldn't have"</td><td><code>git revert &lt;sha&gt;</code> if pushed; <code>git reset --soft HEAD~1</code> if local</td></tr>
+    <tr><td>"I committed a secret"</td><td><strong>Rotate the secret first.</strong> Then rewrite history with <code>git filter-repo</code> or BFG.</td></tr>
+    <tr><td>"I want to undo a force-push"</td><td>Find old SHA in reflog, <code>git push --force-with-lease origin &lt;sha&gt;:&lt;branch&gt;</code></td></tr>
+    <tr><td>"I'm stuck mid-merge / mid-rebase"</td><td><code>git merge --abort</code> / <code>git rebase --abort</code></td></tr>
+    <tr><td>"Working tree is in a weird state"</td><td><code>git status</code>, then <code>git restore</code> what's broken</td></tr>
+    <tr><td>"git is slow"</td><td><code>git maintenance start</code>, or one-shot <code>git gc --aggressive</code></td></tr>
+  </table>
+
+  <h3>Performance &amp; large repo tips</h3>
+  <ul class="plain">
+    <li>Enable <code>git maintenance start</code> for background gc/prefetch.</li>
+    <li>Use <strong>partial clone</strong> (<code>--filter=blob:none</code>) to defer blob downloads.</li>
+    <li>Use <strong>sparse-checkout</strong> in monorepos to materialize only the dirs you need.</li>
+    <li>Set <code>fetch.writeCommitGraph=true</code> for faster <code>git log</code> on big repos.</li>
+    <li>Use <code>core.fsmonitor=true</code> to avoid scanning the working tree on every command.</li>
+    <li>Repack with <code>git repack -ad --depth=50 --window=250</code> for major space savings.</li>
+  </ul>
+
+  <h3>Security</h3>
+  <ul class="plain">
+    <li><strong>Sign commits and tags.</strong> Configure <code>user.signingkey</code> + <code>commit.gpgsign=true</code> + <code>tag.gpgsign=true</code>. Modern Git supports SSH signing too.</li>
+    <li><strong>Verify signatures.</strong> <code>git log --show-signature</code> / <code>git verify-tag &lt;tag&gt;</code>.</li>
+    <li><strong>Branch protection on main.</strong> Require PR + reviews + CI checks. Block force-pushes.</li>
+    <li><strong>Secret scanning.</strong> GitHub catches some leaks automatically; pair with pre-commit secret scanners (<code>gitleaks</code>, <code>trufflehog</code>).</li>
+    <li><strong>Audit dependencies.</strong> Dependabot for npm/pypi/cargo, weekly. Renovate for more nuanced rules.</li>
+    <li><strong>Two-factor auth.</strong> Required for GitHub contributors as of 2024. Use a hardware key if possible.</li>
+  </ul>
+
+  <div class="note danger">
+    <span class="label">If you push a secret</span>
+    <strong>Rotate the secret immediately.</strong> Rewriting history doesn't help if the bad commit was pushed even briefly — assume it's been scraped. Then rewrite history with <a class="ref" href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener">git filter-repo</a> (the modern replacement for <code>git filter-branch</code>) and force-push.
+  </div>
+
+  <div class="docs-links">
+    <div class="docs-links-label">Read deeper</div>
+    <ul>
+      <li><a class="ref" href="https://git-scm.com/book/en/v2" target="_blank" rel="noopener">Pro Git book (free)</a></li>
+      <li><a class="ref" href="https://git-scm.com/docs" target="_blank" rel="noopener">Official Git documentation</a></li>
+      <li><a class="ref" href="https://docs.github.com" target="_blank" rel="noopener">GitHub docs</a></li>
+      <li><a class="ref" href="https://ohshitgit.com" target="_blank" rel="noopener">Oh Shit, Git!?!</a></li>
+      <li><a class="ref" href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener">git filter-repo (history rewriting)</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div>Git &amp; GitHub · v2.54.0 master cheatsheet · modern syntax · CLI-first.</div>
+  <div>
+    <a href="https://git-scm.com/docs">git-scm</a> ·
+    <a href="https://cli.github.com/manual/">gh manual</a> ·
+    <a href="https://docs.github.com">github docs</a>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
